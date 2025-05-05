@@ -225,34 +225,34 @@ def GenerateSoilProfiles(Stratification):
         Utils.AppendToSoilProfiles(Utils.soilprofiles(sp, Stratification, SoilProfiles, [29*i,2], i))
 
     #### Soil profile 1
-    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP1', Stratification, SoilProfiles, [0,2], 0))
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP1', Stratification, SoilProfiles, [0,2], 0))
     
     #### Soil profile 2
-    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP2', Stratification, SoilProfiles, [28,2], 1))
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP2', Stratification, SoilProfiles, [28,2], 1))
     
     #### Soil profile 3
-    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP3', Stratification, SoilProfiles, [56,2], 2))
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP3', Stratification, SoilProfiles, [56,2], 2))
     
     #### Soil profile 4
-    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP4', Stratification, SoilProfiles, [85,2], 3))
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP4', Stratification, SoilProfiles, [85,2], 3))
     
     #### Soil profile 5
-    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP5', Stratification, SoilProfiles, [114,2], 4))
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP5', Stratification, SoilProfiles, [114,2], 4))
 
     #### Soil profile 6
-    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP6', Stratification, SoilProfiles, [143,2], 6))
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP6', Stratification, SoilProfiles, [143,2], 6))
     
     #### Soil profile 7
-    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP7', Stratification, SoilProfiles, [172,2], 7))
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP7', Stratification, SoilProfiles, [172,2], 7))
 
     #### Soil profile 8
-    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP8', Stratification, SoilProfiles, [201,2], 8))
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP8', Stratification, SoilProfiles, [201,2], 8))
 
     #### Soil profile 9
-    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP9', Stratification, SoilProfiles, [231,2], 9))
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP9', Stratification, SoilProfiles, [231,2], 9))
     
     #### Soil profile 10
-    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP9', Stratification, SoilProfiles, [259,2], 10))
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP9', Stratification, SoilProfiles, [259,2], 10))
     
     return SoilProfiles
     
@@ -303,134 +303,51 @@ def GenerateAddPressProfiles(Add_pres):
     ############# ADDITTIONAL PRESSURE PROFILES
     
     #### AP1
-    AP1 = np.where((Add_pres.iloc[:,0]) == 'AP1')
-    AP1 = AP1[0]
-    null = np.where(pd.isnull(Add_pres.iloc[:,1]))
-    index_max = null[0][null[0] > AP1] 
-    index_max = index_max[0]  ### End index of AP1
-    
-    for x in range(AP1[0]+1,index_max):
-        AdditionalPressures['AP1']['z'].append(float(format(Add_pres.iloc[x,1],'.2f')))
-        AdditionalPressures['AP1']['ez'].append(float(format(Add_pres.iloc[x,2],'.2f')))
+    temp = Utils.AddPressProfiles(1, Add_pres, AdditionalPressures)
+    AdditionalPressures = temp
 
     #### AP2
-    AP2 = np.where((Add_pres.iloc[:,0]) == 'AP2')
-    AP2 = AP2[0]
-    null = np.where(pd.isnull(Add_pres.iloc[:,1]))
-    index_max = null[0][null[0] > AP2] 
-    index_max = index_max[0]  ### End index of AP2
-    
-    for x in range(AP2[0]+1,index_max):
-        AdditionalPressures['AP2']['z'].append(float(format(Add_pres.iloc[x,1],'.2f')))
-        AdditionalPressures['AP2']['ez'].append(float(format(Add_pres.iloc[x,2],'.2f')))
+    temp = Utils.AddPressProfiles(2, Add_pres, AdditionalPressures)
+    AdditionalPressures = temp
         
     #### AP3
-    AP3 = np.where((Add_pres.iloc[:,0]) == 'AP3')
-    AP3 = AP3[0]
-    null = np.where(pd.isnull(Add_pres.iloc[:,1]))
-    index_max = null[0][null[0] > AP3] 
-    index_max = index_max[0]  ### End index of AP3
-    
-    for x in range(AP3[0]+1,index_max):
-        AdditionalPressures['AP3']['z'].append(float(format(Add_pres.iloc[x,1],'.2f')))
-        AdditionalPressures['AP3']['ez'].append(float(format(Add_pres.iloc[x,2],'.2f')))
+    temp = Utils.AddPressProfiles(3, Add_pres, AdditionalPressures)
+    AdditionalPressures = temp
     
     
     #### AP4
-    AP4 = np.where((Add_pres.iloc[:,0]) == 'AP4')
-    AP4 = AP4[0]
-    null = np.where(pd.isnull(Add_pres.iloc[:,1]))
-    index_max = null[0][null[0] > AP4] 
-    index_max = index_max[0]  ### End index of AP4
-    
-    for x in range(AP4[0]+1,index_max):
-        AdditionalPressures['AP4']['z'].append(float(format(Add_pres.iloc[x,1],'.2f')))
-        AdditionalPressures['AP4']['ez'].append(float(format(Add_pres.iloc[x,2],'.2f')))
+    temp = Utils.AddPressProfiles(4, Add_pres, AdditionalPressures)
+    AdditionalPressures = temp
     
     
     #### AP5
-    AP5 = np.where((Add_pres.iloc[:,0]) == 'AP5')
-    AP5 = AP5[0]
-    null = np.where(pd.isnull(Add_pres.iloc[:,1]))
-    index_max = null[0][null[0] > AP5] 
-    index_max = index_max[0]  ### End index of AP5
-    
-    for x in range(AP5[0]+1,index_max):
-        AdditionalPressures['AP5']['z'].append(float(format(Add_pres.iloc[x,1],'.2f')))
-        AdditionalPressures['AP5']['ez'].append(float(format(Add_pres.iloc[x,2],'.2f')))
+    temp = Utils.AddPressProfiles(5, Add_pres, AdditionalPressures)
+    AdditionalPressures = temp
     
     
     #### AP6
-    AP6 = np.where((Add_pres.iloc[:,0]) == 'AP6')
-    AP6 = AP6[0]
-    null = np.where(pd.isnull(Add_pres.iloc[:,1]))
-    index_max = null[0][null[0] > AP6] 
-    index_max = index_max[0]  ### End index of AP6
-    
-    for x in range(AP6[0]+1,index_max):
-        AdditionalPressures['AP6']['z'].append(float(format(Add_pres.iloc[x,1],'.2f')))
-        AdditionalPressures['AP6']['ez'].append(float(format(Add_pres.iloc[x,2],'.2f')))
-    
-    
-    #### AP6
-    AP6 = np.where((Add_pres.iloc[:,0]) == 'AP6')
-    AP6 = AP6[0]
-    null = np.where(pd.isnull(Add_pres.iloc[:,1]))
-    index_max = null[0][null[0] > AP6] 
-    index_max = index_max[0]  ### End index of AP6
-    
-    for x in range(AP6[0]+1,index_max):
-        AdditionalPressures['AP6']['z'].append(float(format(Add_pres.iloc[x,1],'.2f')))
-        AdditionalPressures['AP6']['ez'].append(float(format(Add_pres.iloc[x,2],'.2f')))
+    temp = Utils.AddPressProfiles(6, Add_pres, AdditionalPressures)
+    AdditionalPressures = temp
     
     
     #### AP7
-    AP7 = np.where((Add_pres.iloc[:,0]) == 'AP7')
-    AP7 = AP7[0]
-    null = np.where(pd.isnull(Add_pres.iloc[:,1]))
-    index_max = null[0][null[0] > AP7] 
-    index_max = index_max[0]  ### End index of AP7
-    
-    for x in range(AP7[0]+1,index_max):
-        AdditionalPressures['AP7']['z'].append(float(format(Add_pres.iloc[x,1],'.2f')))
-        AdditionalPressures['AP7']['ez'].append(float(format(Add_pres.iloc[x,2],'.2f')))
+    temp = Utils.AddPressProfiles(7, Add_pres, AdditionalPressures)
+    AdditionalPressures = temp
     
     
     #### AP8
-    AP8 = np.where((Add_pres.iloc[:,0]) == 'AP8')
-    AP8 = AP8[0]
-    null = np.where(pd.isnull(Add_pres.iloc[:,1]))
-    index_max = null[0][null[0] > AP8] 
-    index_max = index_max[0]  ### End index of AP8
-    
-    for x in range(AP8[0]+1,index_max):
-        AdditionalPressures['AP8']['z'].append(float(format(Add_pres.iloc[x,1],'.2f')))
-        AdditionalPressures['AP8']['ez'].append(float(format(Add_pres.iloc[x,2],'.2f')))
+    temp = Utils.AddPressProfiles(8, Add_pres, AdditionalPressures)
+    AdditionalPressures = temp
     
     
     #### AP9
-    AP9 = np.where((Add_pres.iloc[:,0]) == 'AP9')
-    AP9 = AP9[0]
-    null = np.where(pd.isnull(Add_pres.iloc[:,1]))
-    index_max = null[0][null[0] > AP9] 
-    index_max = index_max[0]  ### End index of AP9
-    
-    for x in range(AP9[0]+1,index_max):
-        AdditionalPressures['AP9']['z'].append(float(format(Add_pres.iloc[x,1],'.2f')))
-        AdditionalPressures['AP9']['ez'].append(float(format(Add_pres.iloc[x,2],'.2f')))
+    temp = Utils.AddPressProfiles(9, Add_pres, AdditionalPressures)
+    AdditionalPressures = temp
     
     
     #### AP10
-    AP10 = np.where((Add_pres.iloc[:,0]) == 'AP10')
-    AP10 = AP10[0]
-    null = np.where(pd.isnull(Add_pres.iloc[:,1]))
-    index_max = null[0][null[0] > AP10] 
-    index_max = index_max[0]  ### End index of AP10
-    
-    for x in range(AP10[0]+1,index_max):
-        AdditionalPressures['AP10']['z'].append(float(format(Add_pres.iloc[x,1],'.2f')))
-        AdditionalPressures['AP10']['ez'].append(float(format(Add_pres.iloc[x,2],'.2f')))
-    
+    temp = Utils.AddPressProfiles(10, Add_pres, AdditionalPressures)
+    AdditionalPressures = temp
     
     return AdditionalPressures
 
