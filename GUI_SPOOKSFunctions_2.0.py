@@ -3,7 +3,7 @@
 #"""
 #Created on Sat Oct 24 11:45:53 2020
 
-#@author: EMBT
+#@author: EMBT, JKGA
 #"""
 
 
@@ -11,7 +11,7 @@
 
 ####### This script intends to calculate spookswat analyses from an excel input file
 ####### structured as SPOOKSINPUT.xlsx. 
-## Vers 2.0
+## Vers 2.1
 # Prepared: EMBT, 10.10.2023
 # Checked: SEMS, CHHJ
 ## Vers 1.0
@@ -19,11 +19,37 @@
 # Checked: EMSS, 06.07.2020
 
 
+### Imports
+from Utils import Utils
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.backends.backend_pdf
+import subprocess
+import io
+import os
+import tkinter as tk
+import tkinter.scrolledtext as tkst
+import contextlib
+import PyPDF2
+import os
+import subprocess
+import time
+
+from fpdf import FPDF
+from getpass import getuser
+from datetime import datetime
+from openpyxl import load_workbook
+from tkinter import ttk
+from tkinter import filedialog
+from scipy.interpolate import interp1d
+from shutil import copyfile
 
 
 ################ Version ##################
 
-Version = '2.0'
+Version = '2.1'
 
 ################ Input file ID ############
 
@@ -36,10 +62,9 @@ from Steel_Sheet_Pile_Wall import steel_sheet_pile_implementer
 
 
 def log_usage():
-    from datetime import datetime
+
     import getpass
     import socket
-    import os
     try:
         log_path = r"O:\Organisation\DK_1551\Diverse\SpooksLog"
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -71,8 +96,7 @@ def InputFileIDChecker(InputFileID):
         
 def TemporaryWorkingDirectory():
     
-    import os
-    from getpass import getuser
+
     user = "MLHU"
     
     ## output path
@@ -89,9 +113,7 @@ def TemporaryWorkingDirectory():
 def ImportExcel(input_path):
     
     ## Libraries
-    import pandas as pd
-    from openpyxl import load_workbook
-    import io
+
     
     
     #### Loading excel workbook
@@ -114,110 +136,25 @@ def ImportExcel(input_path):
     
     
     ########### 3.1. LOADING DATA SHEETS TO PANDAS DATAFRAMES #########
+
     
-    ### Checking InputFileID
-    data_rows = []
-    for row in INFO['A1':'H28']:
-        data_cols = []
-        for cell in row:
-            data_cols.append(cell.value)
-        data_rows.append(data_cols)
-        
-    INFO = pd.DataFrame(data_rows)
+    data_array = [INFO['A1':'H28'], GeneralInfo['A3':'B7'], Stratification['A4':'K289'], Wall['A3':'B5'], Water['A3':'A5'], Add_pres['A3':'C114'], Analyses['A3':'AA56'], LoadComb['A3':'M42'], SheetPileAddOn['A1':'G30']]
+    docready_array = Utils.data_rows_arr(data_array)
+
+    ###### This returns an array with all the data post processing. So docready_array[0] is INFO, docready_array[1] is stratification etc.
+    INFO = pd.DataFrame(docready_array[0])
+    Stratification = docready_array[1]
     InputFileID = str(INFO.iloc[27,1])
 
-    ### Interval containing information on general information
-    data_rows = []
-    for row in GeneralInfo['A3':'B7']:
-        data_cols = []
-        for cell in row:
-            data_cols.append(cell.value)
-        data_rows.append(data_cols)
-        
-    GeneralInfo = pd.DataFrame(data_rows)
-    
-    ### Interval containing information on soil
-    data_rows = []
-    for row in Stratification['A4':'K289']:
-        data_cols = []
-        for cell in row:
-            data_cols.append(cell.value)
-        data_rows.append(data_cols)
-        
-    Stratification = pd.DataFrame(data_rows)
-    
-    
-    ### Interval containing information on wall
-    data_rows = []
-    for row in Wall['A3':'B5']:
-        data_cols = []
-        for cell in row:
-            data_cols.append(cell.value)
-        data_rows.append(data_cols)
-        
-    Wall = pd.DataFrame(data_rows)
-    
-    ### Interval containing information on water
-    data_rows = []
-    for row in Water['A3':'A5']:
-        data_cols = []
-        for cell in row:
-            data_cols.append(cell.value)
-        data_rows.append(data_cols)
-        
-    Water = pd.DataFrame(data_rows)
-    
-    ### Interval containing information on additional pressure
-    data_rows = []
-    for row in Add_pres['A3':'C114']:
-        data_cols = []
-        for cell in row:
-            data_cols.append(cell.value)
-        data_rows.append(data_cols)
-        
-    Add_pres = pd.DataFrame(data_rows)
-    
-    ### Interval containing information on analyses
-    data_rows = []
-    for row in Analyses['A3':'AA56']:                                                          
-        data_cols = []
-        for cell in row:
-            data_cols.append(cell.value)
-        data_rows.append(data_cols)
-        
-    Analyses = pd.DataFrame(data_rows)
-    
-    ### Interval containing information on load combinations                               
-    data_rows = []
-    for row in LoadComb['A3':'M42']:
-        data_cols = []
-        for cell in row:
-            data_cols.append(cell.value)
-        data_rows.append(data_cols)
-        
-    LoadComb = pd.DataFrame(data_rows)
-    
-    
-    ### Interval containing information on load combinations                               
-    data_rows = []
-    for row in SheetPileAddOn['A1':'G30']:
-        data_cols = []
-        for cell in row:
-            data_cols.append(cell.value)
-        data_rows.append(data_cols)
-        
-    SheetPileAddOn = pd.DataFrame(data_rows)
-    
-    
     ImportData = {'InputFileID': InputFileID, 
-                  'GeneralInfo': GeneralInfo,
-                  'Stratification': Stratification,
-                  'Wall': Wall,
-                  'Water': Water,
-                  'AddPress': Add_pres,
-                  'Analyses': Analyses,
-                  'LoadComb': LoadComb,
-                  'SheetPileAddOn': SheetPileAddOn}
+                  'GeneralInfo': docready_array[1],
+                  'Stratification': docready_array[2],
+                  'Wall': docready_array[3],
+                  'Water': docready_array[4],
+                  'AddPress': docready_array[5],
+                  'Analyses': docready_array[6],
+                  'LoadComb': docready_array[7],
+                  'SheetPileAddOn': docready_array[8]}
     
 
     return ImportData
@@ -225,46 +162,12 @@ def ImportExcel(input_path):
 
 
 
-def AppendToSoilProfiles(SoilProfile,Side,index_start, index_end, SoilProfiles,Stratification):
-    
-    for x in range(index_start+2,index_end):
-    
-        SoilLayer = {'TopLayer': None,
-                     'Gamma_d': None,
-                     'Gamma_m': None,
-                     'cu': None,
-                     'c': None,
-                     'phi': None,
-                     'i': None,
-                     'r': None,
-                     'Description': None,
-                     'KeepDrained': None}
-        
-    
-        SoilLayer['TopLayer'] = float(format(Stratification.iloc[x,1], '.2f'))
-        SoilLayer['Gamma_d'] =  float(format(Stratification.iloc[x,2], '.2f'))
-        SoilLayer['Gamma_m'] =  float(format(Stratification.iloc[x,3], '.2f'))
-        SoilLayer['cu'] =       float(format(Stratification.iloc[x,4], '.2f'))
-        SoilLayer['c'] =        float(format(Stratification.iloc[x,5], '.2f'))
-        SoilLayer['phi'] =      float(format(Stratification.iloc[x,6], '.2f'))
-        SoilLayer['i'] =        float(format(Stratification.iloc[x,7], '.2f'))
-        SoilLayer['r'] =        float(format(Stratification.iloc[x,8], '.2f'))
-        SoilLayer['Description'] = Stratification.iloc[x,9]
-        SoilLayer['KeepDrained'] = Stratification.iloc[x,10]
-
-    
-        ## Append to soil profile dictionary
-        
-    
-        SoilProfiles.get(SoilProfile).get(Side).get('Layers').append(SoilLayer)
 
 
 
 
 
 def GenerateSoilProfiles(Stratification):
-    
-    import pandas as pd
     
     SoilProfiles = {'SP1': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
                     'SP2': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
@@ -280,447 +183,76 @@ def GenerateSoilProfiles(Stratification):
 
     
     ################### FRONT SOILS
-    
+    for i in range(10):
+        sp = "SP"+str(i+1)
+        Utils.AppendToSoilProfiles(Utils.soilprofiles(sp, Stratification, SoilProfiles, [29*i,5], i))
+
     #### Soil profile 1
-    SoilProfile = 'SP1'
-    ## Soil stratigraphy front
-    if pd.isnull(Stratification.iloc[0,5]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[0,5] = 0.00
-    
-    SoilProfiles[SoilProfile]['Front']['Slope'] = float(format(Stratification.iloc[0,5], '.2f'))
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP1', Stratification, SoilProfiles, [0,5], 0))
 
-    ## Start of front stratigraphy layers soil profile 1
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Front']
-    index_start = index_start[0]
-    ## end of front stratigraphy layers soil profile 1
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-
-    
-    AppendToSoilProfiles(SoilProfile,'Front',index_start, index_end, SoilProfiles,Stratification)
-            
-    
     #### Soil profile 2
-    SoilProfile = 'SP2'
-    ## Soil stratigraphy front
-    if pd.isnull(Stratification.iloc[28,5]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[28,5] = 0.00
-    
-    SoilProfiles[SoilProfile]['Front']['Slope'] = float(format(Stratification.iloc[28,5], '.2f'))
-    
-
-    ## Start of front stratigraphy layers soil profile 2
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Front']
-    index_start = index_start[1]
-    ## end of front stratigraphy layers soil profile 2
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-    
-    AppendToSoilProfiles(SoilProfile,'Front',index_start, index_end, SoilProfiles,Stratification)
-    
-    
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP2', Stratification, SoilProfiles, [28,5], 1))
     
     #### Soil profile 3
-    SoilProfile = 'SP3'
-    ## Soil stratigraphy front
-    if pd.isnull(Stratification.iloc[56,5]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[56,5] = 0.00
-    
-    SoilProfiles[SoilProfile]['Front']['Slope'] = float(format(Stratification.iloc[56,5], '.2f'))
-    
-
-    ## Start of front stratigraphy layers soil profile 2
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Front']
-    index_start = index_start[2]
-    ## end of front stratigraphy layers soil profile 2
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-    
-    AppendToSoilProfiles(SoilProfile,'Front',index_start, index_end, SoilProfiles,Stratification)
-                
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP3', Stratification, SoilProfiles, [56,5], 2))
     
     #### Soil profile 4
-    SoilProfile = 'SP4'
-    ## Soil stratigraphy front
-    if pd.isnull(Stratification.iloc[85,5]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[85,5] = 0
-    
-    SoilProfiles[SoilProfile]['Front']['Slope'] = float(format(Stratification.iloc[85,5], '.2f'))
-    
-
-    ## Start of front stratigraphy layers soil profile 2
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Front']
-    index_start = index_start[3]
-    ## end of front stratigraphy layers soil profile 2
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-    
-    AppendToSoilProfiles(SoilProfile,'Front',index_start, index_end, SoilProfiles,Stratification)
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP4', Stratification, SoilProfiles, [85,5], 3))
     
     #### Soil profile 5
-    SoilProfile = 'SP5'
-    ## Soil stratigraphy front
-    if pd.isnull(Stratification.iloc[114,5]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[114,5] = 0
-    
-    SoilProfiles[SoilProfile]['Front']['Slope'] = float(format(Stratification.iloc[114,5], '.2f'))
-    
-
-    ## Start of front stratigraphy layers soil profile 2
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Front']
-    index_start = index_start[4]
-    ## end of front stratigraphy layers soil profile 2
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-    
-    AppendToSoilProfiles(SoilProfile,'Front',index_start, index_end, SoilProfiles,Stratification)
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP5', Stratification, SoilProfiles, [114,5], 4))
     
     #### Soil profile 6
-    SoilProfile = 'SP6'
-    ## Soil stratigraphy front
-    if pd.isnull(Stratification.iloc[143,5]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[143,5] = 0
-    
-    SoilProfiles[SoilProfile]['Front']['Slope'] = float(format(Stratification.iloc[143,5], '.2f'))
-    
-
-    ## Start of front stratigraphy layers soil profile 2
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Front']
-    index_start = index_start[5]
-    ## end of front stratigraphy layers soil profile 2
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-    
-    AppendToSoilProfiles(SoilProfile,'Front',index_start, index_end, SoilProfiles,Stratification)
-                
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP6', Stratification, SoilProfiles, [143,5], 5))        
                 
     #### Soil profile 7
-    SoilProfile = 'SP7'
-    ## Soil stratigraphy front
-    if pd.isnull(Stratification.iloc[172,5]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[172,5] = 0
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP7', Stratification, SoilProfiles, [172,5], 6))
     
-    SoilProfiles[SoilProfile]['Front']['Slope'] = float(format(Stratification.iloc[172,5], '.2f'))
-    
-
-    ## Start of front stratigraphy layers soil profile 7
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Front']
-    index_start = index_start[6]
-    ## end of front stratigraphy layers soil profile 7
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-    
-    AppendToSoilProfiles(SoilProfile,'Front',index_start, index_end, SoilProfiles,Stratification)
-                            
-                
     #### Soil profile 8
-    SoilProfile = 'SP8'
-    ## Soil stratigraphy front
-    if pd.isnull(Stratification.iloc[201,5]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[201,5] = 0
-    
-    SoilProfiles[SoilProfile]['Front']['Slope'] = float(format(Stratification.iloc[201,5], '.2f'))
-    
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP8', Stratification, SoilProfiles, [201,5], 7))
 
-    ## Start of front stratigraphy layers soil profile 8
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Front']
-    index_start = index_start[7]
-    ## end of front stratigraphy layers soil profile 8
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-    
-    AppendToSoilProfiles(SoilProfile,'Front',index_start, index_end, SoilProfiles,Stratification)
-    
     #### Soil profile 9
-    SoilProfile = 'SP9'
-    ## Soil stratigraphy front
-    if pd.isnull(Stratification.iloc[230,5]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[230,5] = 0
-    
-    SoilProfiles[SoilProfile]['Front']['Slope'] = float(format(Stratification.iloc[230,5], '.2f'))
-    
-
-    ## Start of front stratigraphy layers soil profile 9
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Front']
-    index_start = index_start[8]
-    ## end of front stratigraphy layers soil profile 9
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-    
-    AppendToSoilProfiles(SoilProfile,'Front',index_start, index_end, SoilProfiles,Stratification)
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP9', Stratification, SoilProfiles, [230,5], 8))
     
     #### Soil profile 10
-    SoilProfile = 'SP10'
-    ## Soil stratigraphy front
-    if pd.isnull(Stratification.iloc[259,5]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[259,5] = 0
-    
-    SoilProfiles[SoilProfile]['Front']['Slope'] = float(format(Stratification.iloc[259,5], '.2f'))
-    
+    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP8', Stratification, SoilProfiles, [259,5], 8))
 
-    ## Start of front stratigraphy layers soil profile 10
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Front']
-    index_start = index_start[9]
-    ## end of front stratigraphy layers soil profile 10
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-    
-    AppendToSoilProfiles(SoilProfile,'Front',index_start, index_end, SoilProfiles,Stratification)
-                
-                
-                            
 
-            
     # ############# BACK SOILS
     
+    for i in range(10):
+        sp = "SP"+str(i+1)
+        Utils.AppendToSoilProfiles(Utils.soilprofiles(sp, Stratification, SoilProfiles, [29*i,2], i))
+
     #### Soil profile 1
-    SoilProfile = 'SP1'
-    ## Soil stratigraphy back
-    if pd.isnull(Stratification.iloc[0,2]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[0,2] = 0
-    
-    SoilProfiles[SoilProfile]['Back']['Slope'] = float(format(Stratification.iloc[0,2], '.2f'))
-
-    ## Start of front stratigraphy layers soil profile 1
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Back']
-    index_start = index_start[0]
-    ## end of front stratigraphy layers soil profile 1
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-
-    
-    AppendToSoilProfiles(SoilProfile,'Back',index_start, index_end, SoilProfiles,Stratification)
-        
+    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP1', Stratification, SoilProfiles, [0,2], 0))
     
     #### Soil profile 2
-    SoilProfile = 'SP2'
-    ## Soil stratigraphy back
-    if pd.isnull(Stratification.iloc[28,2]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[28,2] = 0
-    
-    SoilProfiles[SoilProfile]['Back']['Slope'] = float(format(Stratification.iloc[28,2], '.2f'))
-
-    ## Start of front stratigraphy layers soil profile 1
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Back']
-    index_start = index_start[1]
-    ## end of front stratigraphy layers soil profile 1
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-
-    
-    AppendToSoilProfiles(SoilProfile,'Back',index_start, index_end, SoilProfiles,Stratification)
-    
+    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP2', Stratification, SoilProfiles, [28,2], 1))
     
     #### Soil profile 3
-    SoilProfile = 'SP3'
-    ## Soil stratigraphy back
-    if pd.isnull(Stratification.iloc[56,2]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[56,2] = 0
-    
-    SoilProfiles[SoilProfile]['Back']['Slope'] = float(format(Stratification.iloc[56,2], '.2f'))
-
-    ## Start of front stratigraphy layers soil profile 1
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Back']
-    index_start = index_start[2]
-    ## end of front stratigraphy layers soil profile 1
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-
-    
-    AppendToSoilProfiles(SoilProfile,'Back',index_start, index_end, SoilProfiles,Stratification)
-    
+    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP3', Stratification, SoilProfiles, [56,2], 2))
     
     #### Soil profile 4
-    SoilProfile = 'SP4'
-    ## Soil stratigraphy back
-    if pd.isnull(Stratification.iloc[85,2]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[85,2] = 0
-    
-    SoilProfiles[SoilProfile]['Back']['Slope'] = float(format(Stratification.iloc[85,2], '.2f'))
-
-    ## Start of front stratigraphy layers soil profile 1
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Back']
-    index_start = index_start[3]
-    ## end of front stratigraphy layers soil profile 1
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-
-    
-    AppendToSoilProfiles(SoilProfile,'Back',index_start, index_end, SoilProfiles,Stratification)
-    
+    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP4', Stratification, SoilProfiles, [85,2], 3))
     
     #### Soil profile 5
-    SoilProfile = 'SP5'
-    ## Soil stratigraphy back
-    if pd.isnull(Stratification.iloc[114,2]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[114,2] = 0
-    
-    SoilProfiles[SoilProfile]['Back']['Slope'] = float(format(Stratification.iloc[114,2], '.2f'))
+    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP5', Stratification, SoilProfiles, [114,2], 4))
 
-    ## Start of front stratigraphy layers soil profile 1
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Back']
-    index_start = index_start[4]
-    ## end of front stratigraphy layers soil profile 1
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-
-    
-    AppendToSoilProfiles(SoilProfile,'Back',index_start, index_end, SoilProfiles,Stratification)
-    
-    
     #### Soil profile 6
-    SoilProfile = 'SP6'
-    ## Soil stratigraphy back
-    if pd.isnull(Stratification.iloc[143,2]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[143,2] = 0
-    
-    SoilProfiles[SoilProfile]['Back']['Slope'] = float(format(Stratification.iloc[143,2], '.2f'))
-
-    ## Start of front stratigraphy layers soil profile 1
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Back']
-    index_start = index_start[5]
-    ## end of front stratigraphy layers soil profile 1
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-
-    
-    AppendToSoilProfiles(SoilProfile,'Back',index_start, index_end, SoilProfiles,Stratification)
-    
-    
+    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP6', Stratification, SoilProfiles, [143,2], 6))
     
     #### Soil profile 7
-    SoilProfile = 'SP7'
-    ## Soil stratigraphy back
-    if pd.isnull(Stratification.iloc[172,2]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[172,2] = 0
-    
-    SoilProfiles[SoilProfile]['Back']['Slope'] = float(format(Stratification.iloc[172,2], '.2f'))
+    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP7', Stratification, SoilProfiles, [172,2], 7))
 
-    ## Start of front stratigraphy layers soil profile 1
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Back']
-    index_start = index_start[6]
-    ## end of front stratigraphy layers soil profile 1
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-
-    
-    AppendToSoilProfiles(SoilProfile,'Back',index_start, index_end, SoilProfiles,Stratification)
-    
-    
     #### Soil profile 8
-    SoilProfile = 'SP8'
-    ## Soil stratigraphy back
-    if pd.isnull(Stratification.iloc[201,2]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[201,2] = 0
-    
-    SoilProfiles[SoilProfile]['Back']['Slope'] = float(format(Stratification.iloc[201,2], '.2f'))
-
-    ## Start of front stratigraphy layers soil profile 1
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Back']
-    index_start = index_start[7]
-    ## end of front stratigraphy layers soil profile 1
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-
-    
-    AppendToSoilProfiles(SoilProfile,'Back',index_start, index_end, SoilProfiles,Stratification)
-
+    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP8', Stratification, SoilProfiles, [201,2], 8))
 
     #### Soil profile 9
-    SoilProfile = 'SP9'
-    ## Soil stratigraphy back
-    if pd.isnull(Stratification.iloc[231,2]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[231,2] = 0
-    
-    SoilProfiles[SoilProfile]['Back']['Slope'] = float(format(Stratification.iloc[231,2], '.2f'))
-
-    ## Start of front stratigraphy layers soil profile 9
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Back']
-    index_start = index_start[8]
-    ## end of front stratigraphy layers soil profile 9
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-
-    
-    AppendToSoilProfiles(SoilProfile,'Back',index_start, index_end, SoilProfiles,Stratification)
+    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP9', Stratification, SoilProfiles, [231,2], 9))
     
     #### Soil profile 10
-    SoilProfile = 'SP10'
-    ## Soil stratigraphy back
-    if pd.isnull(Stratification.iloc[259,2]) == True: ## if no value entered in slope -> value is 0
-        Stratification.iloc[259,2] = 0
-    
-    SoilProfiles[SoilProfile]['Back']['Slope'] = float(format(Stratification.iloc[259,2], '.2f'))
-
-    ## Start of front stratigraphy layers soil profile 1
-    index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Back']
-    index_start = index_start[9]
-    ## end of front stratigraphy layers soil profile 1
-    index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-    if not index_end:
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-    else:
-        index_end = index_end[0]
-
-    
-    AppendToSoilProfiles(SoilProfile,'Back',index_start, index_end, SoilProfiles,Stratification)
+    Utils.AppendToSoilProfiles(Utils.soilprofiles('SP9', Stratification, SoilProfiles, [259,2], 10))
     
     return SoilProfiles
     
@@ -769,8 +301,6 @@ def GenerateAddPressProfiles(Add_pres):
     
     
     ############# ADDITTIONAL PRESSURE PROFILES
-    import numpy as np
-    import pandas as pd
     
     #### AP1
     AP1 = np.where((Add_pres.iloc[:,0]) == 'AP1')
@@ -909,8 +439,6 @@ def GenerateAddPressProfiles(Add_pres):
 
 def GeneratePartialCoefficientDictionary(LoadComb):
     
-    import numpy as np
-    
     
     LoadCombinations = {'CC2': {},
                         'CC3': {}}
@@ -1016,9 +544,6 @@ def GenerateSheetPileAddOnInput(SheetPileAddOn):
 
 def AnalysesRange(Analyses):
     
-    import numpy as np
-    import pandas as pd
-    
     ### The script checks if data is entered in all relevant analysis columns
     null0 = np.amin(np.where(pd.isnull(Analyses.iloc[:,0]))) ### Script aims for the first cell in which the user hasn't entered Subject text
     null1 = np.amin(np.where(pd.isnull(Analyses.iloc[:,1]))) ### Script aims for the first cell of which the user hasn't entered Soil profile (SP)
@@ -1106,8 +631,6 @@ def AddPressureToAnalysis(GeneratedAnalyses,AdditionalPressures):
 
 
 def AddDesignParameters(GeneratedAnalyses,LoadComb):
-    
-    import numpy as np
     
     LoadCombinations = GeneratePartialCoefficientDictionary(LoadComb)
     
@@ -1226,8 +749,6 @@ def AddDesignParameters(GeneratedAnalyses,LoadComb):
     
 
 def GenerateAnalyses(input_path):
-    
-    import numpy as np
     
     ## Importing Excel file
     ImportData = ImportExcel(input_path)
@@ -1774,7 +1295,6 @@ def GenerateSPOOKSInputFile(Analysis):
         
     
     ###### OUTPUT PATHS (SPOOKS working directory - temporary files)
-    import os
     
     TemporaryPath = TemporaryWorkingDirectory()
     
@@ -1868,8 +1388,6 @@ def GenerateSPOOKSInputFile(Analysis):
 
 def LogFile(InputFileDir,AnalysisNo,SPOOKSOut):
     
-    import os
-    
     logfile = os.path.join(InputFileDir, r'log_file.txt')
     
     if AnalysisNo == 0:  ### Creates (or overwrites existing) log file
@@ -1895,8 +1413,7 @@ def ExecuteSPOOKS(Analysis,logtxt,tk):
     SPOOKSPlotFile = Output.get('SPOOKSPlotFile')
     
     
-    import subprocess
-    from datetime import datetime
+    
     ## Date and time
     Now = datetime.now() # current date and time
     DateTime = Now.strftime("%d.%m.%Y, %H:%M:%S")
@@ -1966,8 +1483,6 @@ def GetResults(ExecuteOutput):
     SPOOKSPlotFile = ExecuteOutput.get('SPOOKSPlotFile')
     Date = ExecuteOutput.get('Date')
     DateTime = ExecuteOutput.get('DateTime')
-    
-    import numpy as np
     
     
     ## Initialise variables
@@ -2188,8 +1703,6 @@ def VerticalEquilibrium(GetResultsOutput):
     
     ### tangential earthpressure calculated as qs = e * tan(delta) + adhesion , where r = tan(delta)/tan(phi) = adhesion/cohesion
     ### for undrained layers qs = cu * r
-
-    import numpy as np
     
     Analysis = GetResultsOutput.get('Analysis')
     AxialWallLoad = Analysis.get('AxialWallLoad')
@@ -2360,10 +1873,8 @@ def ReportFront(VerticalEquilibriumOutput,OutputDirList,Version):
     print(WeightWallTotal)
     
     
-    import matplotlib.pyplot as plt
-    import matplotlib.backends.backend_pdf
-    from scipy.interpolate import interp1d
-    import numpy as np
+    
+    
     ### Turning interactive plotting off
     plt.ioff()
         
@@ -2570,7 +2081,6 @@ def ReportFront(VerticalEquilibriumOutput,OutputDirList,Version):
 
     
     ## Save report front plot in temporary working directory
-    import os
     
     TemporaryPath = TemporaryWorkingDirectory()
     
@@ -2593,7 +2103,6 @@ def ReportFront(VerticalEquilibriumOutput,OutputDirList,Version):
 
 
 def PDFGenerator(VerticalEquilibriumOutput, SheetPileAddOnResults, Version):
-    import numpy as np
     
     print('Generating report pages...')
 
@@ -2700,8 +2209,7 @@ def PDFGenerator(VerticalEquilibriumOutput, SheetPileAddOnResults, Version):
     
 
 
-    import numpy as np
-    from fpdf import FPDF
+    
         
     # ## Font for cowi logo
     # pdf.add_font('century', '', r"C:\Users\EMBT\OneDrive - COWI\Documents\Python\SPOOKS\CENSCBK.TTF", uni=True)
@@ -3308,8 +2816,7 @@ def PDFGenerator(VerticalEquilibriumOutput, SheetPileAddOnResults, Version):
 
       
     # save the pdf with name .pdf
-    import os
-    
+
     TemporaryPath = TemporaryWorkingDirectory()
     
     TemporaryPath = os.path.join(TemporaryPath, r'pdfresults.pdf')
@@ -3355,9 +2862,7 @@ def ReportGenerator(GetResultsOutput,OutputDirList,Version):
     
     TemporaryPathResults = PDFGenerator(VerticalEquilibriumOutput, SheetPileAddOnResults, Version)
     
-    import contextlib
-    import PyPDF2
-    import os
+
     
     
 
@@ -3404,10 +2909,7 @@ def ReportsMerger(FeederOutput,OutputDirList,Version,stat,tabcalc,pb,calcno):
     tabcalc.update_idletasks()
     
     print('Merging report pages...')
-    
-    import contextlib
-    import PyPDF2
-    import os
+
     
         
     
@@ -3417,7 +2919,6 @@ def ReportsMerger(FeederOutput,OutputDirList,Version,stat,tabcalc,pb,calcno):
     OutputDirectory = os.path.join(OutputDirList[-1],r'WinSpooksReport.pdf')
     
     ## Inital empty file
-    import os
     TempFile = os.path.join(TemporaryDir, r'TempFile.pdf')
     TemporaryFile = os.path.join(TemporaryDir, r'WinSpooksReport.pdf')
     
@@ -3487,7 +2988,7 @@ def ReportsMerger(FeederOutput,OutputDirList,Version,stat,tabcalc,pb,calcno):
             
                 
     ## Copy report to user defined destination
-    from shutil import copyfile
+
 
     try:
         copyfile(TemporaryFile,OutputDirectory)
@@ -3513,7 +3014,6 @@ def PlotResults(FeederOutput):
         GetResultsOutput = Analysis.get('GetResultsOutput')
         ParentAnalyses.append(GetResultsOutput.get('Analysis').get('ParentAnalysis'))
     
-    import numpy as np
     ParentAnalyses = list(np.unique(ParentAnalyses))
     
     for ParentAnalysis in ParentAnalyses:
@@ -3571,7 +3071,7 @@ def PlotResults(FeederOutput):
 
 
                 
-    import matplotlib.pyplot as plt
+
     fig = plt.figure()
     #fig.canvas.set_window_title('WinSpooks Plug-in results')
     ### Max. moment
@@ -3621,8 +3121,6 @@ def PlotResults(FeederOutput):
 
 def ExportResultsAsTxt(FeederOutput, OutputDirList):
     
-    import os
-    import numpy as np
     if FeederOutput[0].get('GetResultsOutput')['Analysis']['SheetPileAddOnInput']['UseAddOn'] == "Yes":
         printlist = [['Analysis No.','Subject', 'Soil Profile',
                      'State', 'Load Combination', 'AnchorLevel',
@@ -3752,10 +3250,6 @@ def ExportEarthPressureResultsAsTxt(FeederOutput, OutputDirList):
     
     ## Temporary file dir
     #TemporaryFile = TemporaryWorkingDirectory()
-   
-
-    import os
-    import numpy as np
     ## Initial empty array
     EarthPressureResults = np.empty((0,8), int) # Empty array
     
@@ -3798,7 +3292,7 @@ def OpenSpooks():
     ################### OPEN WINSPOOKS ###################################
     ######### Check in WinSpooks is running - if not -> Run
     ######### (necessary for license check)
-    import subprocess
+
     res = subprocess.check_output(['tasklist']).splitlines()
     winspooks = []
     for i in range(0,len(res)):
@@ -3807,7 +3301,7 @@ def OpenSpooks():
             winspooks.append(i) 
     
     if winspooks == []:
-        import time
+
         subprocess.Popen(['C:\Program Files (x86)\WinSpooks\WinSpooks.exe'])
         time.sleep(0.5)
     
@@ -3826,10 +3320,7 @@ OpenSpooks()
 
 ################# 2. STARTING UP GUI INTERFACE #######################
 
-import tkinter as tk
-from tkinter import ttk
-from tkinter import filedialog
-import tkinter.scrolledtext as tkst
+
 
 
 window = tk.Tk()
@@ -3873,7 +3364,6 @@ def FileDialog():
 
 def OutputDialog():
     
-    import os
     
     outputdir = filedialog.askdirectory()
     OutputDirList.append(os.path.abspath(outputdir))
@@ -4156,13 +3646,3 @@ label_vers_desc2.grid(column = 5, row = 6, sticky = 'W')
 tab_parent.pack(expand=1, fill='both')
 
 window.mainloop()
-
-
-
-
-
-
-
-
-
-
