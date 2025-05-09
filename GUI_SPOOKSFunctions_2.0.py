@@ -215,70 +215,15 @@ def GenerateAddPressProfiles(Add_pres):
 
 
 def GeneratePartialCoefficientDictionary(LoadComb):
-    
-    
     LoadCombinations = {'CC2': {},
                         'CC3': {}}
               
-
-
     ### Find CC2 partial safety factors
-    index_CC2 = np.where((LoadComb.iloc[:,0]) == 'CC2')
-    index_CC2 = index_CC2[0][0]
-    index_CC3 = np.where((LoadComb.iloc[:,0]) == 'CC3')
-    index_CC3 = index_CC3[0][0]
-    
-    for i in range(index_CC2+2,index_CC3):
-        
-        if LoadComb.iloc[i,0] != None:
-            
-            Loadcombination = LoadComb.iloc[i,0]
-
-                        
-            PartialSafetyFactors = {'f_gamf': float(LoadComb.iloc[i,1]),
-                                    'f_qf':   float(LoadComb.iloc[i,2]),
-                                    'f_cf':   float(LoadComb.iloc[i,3]),
-                                    'f_cuf':  float(LoadComb.iloc[i,4]),
-                                    'f_phif': float(LoadComb.iloc[i,5]),
-                                    'f_wat':  float(LoadComb.iloc[i,6]),
-                                    'f_AP':   float(LoadComb.iloc[i,7]),
-                                    'f_gamb': float(LoadComb.iloc[i,8]),
-                                    'f_qb':   float(LoadComb.iloc[i,9]),
-                                    'f_cb':   float(LoadComb.iloc[i,10]),
-                                    'f_cub':  float(LoadComb.iloc[i,11]),
-                                    'f_phib': float(LoadComb.iloc[i,12])}
-            
-            
-            LoadCombinations.get('CC2')[str(Loadcombination)] = PartialSafetyFactors
-            
+    LoadCombinations.get('CC2') = Utils.PartialSafetyFactors(LoadComb, LoadCombinations, 'CC2')
         
     ### Find CC3 partial safety factors
-    for i in range(index_CC3+2,len(LoadComb.iloc[:,0])):
-        
-        if LoadComb.iloc[i,0] != None:
-            
-            Loadcombination = LoadComb.iloc[i,0]
+    LoadCombinations.get('CC3') = Utils.PartialSafetyFactors(LoadComb, LoadCombinations, 'CC3')
 
-                        
-            PartialSafetyFactors = {'f_gamf': float(LoadComb.iloc[i,1]),
-                                    'f_qf':   float(LoadComb.iloc[i,2]),
-                                    'f_cf':   float(LoadComb.iloc[i,3]),
-                                    'f_cuf':  float(LoadComb.iloc[i,4]),
-                                    'f_phif': float(LoadComb.iloc[i,5]),
-                                    'f_wat':  float(LoadComb.iloc[i,6]),
-                                    'f_AP':   float(LoadComb.iloc[i,7]),
-                                    'f_gamb': float(LoadComb.iloc[i,8]),
-                                    'f_qb':   float(LoadComb.iloc[i,9]),
-                                    'f_cb':   float(LoadComb.iloc[i,10]),
-                                    'f_cub':  float(LoadComb.iloc[i,11]),
-                                    'f_phib': float(LoadComb.iloc[i,12])}
-
-            
-            LoadCombinations.get('CC3')[str(Loadcombination)] = PartialSafetyFactors
-            
-                                
-                        
-    return LoadCombinations
 
 
 def GenerateSheetPileAddOnInput(SheetPileAddOn):
