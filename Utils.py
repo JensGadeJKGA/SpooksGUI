@@ -69,3 +69,38 @@ class Utils:
                 
                 loadcombinations.get(cc)[str(Loadcombination)] = PartialSafetyFactors
         return loadcombinations
+    
+    
+    def GenerateSheetPileAddOnInput(SheetPileAddOn):
+        
+        UseAddOn = SheetPileAddOn.iloc[0,4]
+        LimitState = SheetPileAddOn.iloc[3,6]
+        ControlClass = SheetPileAddOn.iloc[4,6]
+        KFI = SheetPileAddOn.iloc[5,6]
+        Optimize = SheetPileAddOn.iloc[8,6]
+        MaxUtilization = SheetPileAddOn.iloc[9,6]
+        fyk = SheetPileAddOn.iloc[10,6]
+        BetaB = SheetPileAddOn.iloc[11,6]
+        BetaD = SheetPileAddOn.iloc[12,6]
+        DesignLife = SheetPileAddOn.iloc[15,6]
+        tCor = list(SheetPileAddOn.iloc[17:27,6])
+        tCorLevel = list(SheetPileAddOn.iloc[17:27,0])
+        SoilDeposit = SheetPileAddOn.iloc[29,6]
+        
+        
+        
+        SheetPileAddOnInput = {'UseAddOn': UseAddOn,
+                            'LimitState': LimitState,
+                            'ControlClass': ControlClass,
+                            'KFI': KFI,
+                            'Optimize': Optimize,
+                            'MaxUtilization': MaxUtilization,
+                            'fyk': fyk,
+                            'BetaB': BetaB,
+                            'BetaD': BetaD,
+                            'DesignLife': DesignLife,
+                            'tCor': tCor,
+                            'tCorLevel': tCorLevel,
+                            'SoilDeposit': SoilDeposit}
+        
+        return SheetPileAddOnInput
