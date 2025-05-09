@@ -4,7 +4,7 @@ from GUI_SPOOKSFunctions_2_0 import InputFileIDGUI, stat
 
 ###In this file you will find miscellaneous utility functions.
 
-class Utils:
+class utils:
     ####This function generalises the data row creation. The next function does the same thing, but for multiple cells. It takes an array with a set of ranges, and for those ranges it readies the data rows.
     def data_rows(cellrange):
         data_rows = []
@@ -85,55 +85,4 @@ class Utils:
                 loadcombinations.get(cc)[str(Loadcombination)] = PartialSafetyFactors
         return loadcombinations
     
-    def GenerateAddPressProfiles(Add_pres):
-        
-        AdditionalPressures = {'AP1':{'z': [],'ez':[]},
-                            'AP2': {'z': [],'ez':[]},
-                            'AP3': {'z': [],'ez':[]},
-                            'AP4': {'z': [],'ez':[]},
-                            'AP5': {'z': [],'ez':[]},
-                            'AP6': {'z': [],'ez':[]},
-                            'AP7': {'z': [],'ez':[]},
-                            'AP8': {'z': [],'ez':[]},
-                            'AP9': {'z': [],'ez':[]},
-                            'AP10': {'z': [],'ez':[]}}
-        
-        #### APn
-        for i in range(9):
-            AdditionalPressures = Utils.AddPressProfiles(i+1, Add_pres, AdditionalPressures)
-        
-        return AdditionalPressures
     
-    def GenerateSheetPileAddOnInput(SheetPileAddOn):
-        
-        UseAddOn = SheetPileAddOn.iloc[0,4]
-        LimitState = SheetPileAddOn.iloc[3,6]
-        ControlClass = SheetPileAddOn.iloc[4,6]
-        KFI = SheetPileAddOn.iloc[5,6]
-        Optimize = SheetPileAddOn.iloc[8,6]
-        MaxUtilization = SheetPileAddOn.iloc[9,6]
-        fyk = SheetPileAddOn.iloc[10,6]
-        BetaB = SheetPileAddOn.iloc[11,6]
-        BetaD = SheetPileAddOn.iloc[12,6]
-        DesignLife = SheetPileAddOn.iloc[15,6]
-        tCor = list(SheetPileAddOn.iloc[17:27,6])
-        tCorLevel = list(SheetPileAddOn.iloc[17:27,0])
-        SoilDeposit = SheetPileAddOn.iloc[29,6]
-        
-        
-        
-        SheetPileAddOnInput = {'UseAddOn': UseAddOn,
-                            'LimitState': LimitState,
-                            'ControlClass': ControlClass,
-                            'KFI': KFI,
-                            'Optimize': Optimize,
-                            'MaxUtilization': MaxUtilization,
-                            'fyk': fyk,
-                            'BetaB': BetaB,
-                            'BetaD': BetaD,
-                            'DesignLife': DesignLife,
-                            'tCor': tCor,
-                            'tCorLevel': tCorLevel,
-                            'SoilDeposit': SoilDeposit}
-        
-        return SheetPileAddOnInput
