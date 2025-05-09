@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
+
 from GUI_SPOOKSFunctions_2_0 import InputFileIDGUI, stat
+from SpooksHelperLib.Generators import generators
 
 ###In this file you will find miscellaneous utility functions.
 
@@ -85,4 +87,119 @@ class utils:
                 loadcombinations.get(cc)[str(Loadcombination)] = PartialSafetyFactors
         return loadcombinations
     
+
+    def ImportExcel(input_path):
+        #### Loading excel workbook
+        xlsx_filename=input_path
+        with open(xlsx_filename, "rb") as f:
+            in_mem_file = io.BytesIO(f.read())
+        
+        wb = load_workbook(in_mem_file, data_only=True)
+                
+        ## Sheets
+        INFO =  wb['INFO']
+        GeneralInfo = wb['General_information']
+        Stratification = wb['Stratification']
+        Wall = wb['Wall']
+        Water = wb['Water']
+        Add_pres = wb['Additional_pressure_profiles']
+        Analyses = wb['Analyses']
+        LoadComb = wb['Load_combinations']
+        SheetPileAddOn = wb['Addon - Sheet Pile Wall']
+        
+        
+        ########### 3.1. LOADING DATA SHEETS TO PANDAS DATAFRAMES #########
+
+        
+        data_array = [INFO['A1':'H28'], GeneralInfo['A3':'B7'], Stratification['A4':'K289'], Wall['A3':'B5'], Water['A3':'A5'], Add_pres['A3':'C114'], Analyses['A3':'AA56'], LoadComb['A3':'M42'], SheetPileAddOn['A1':'G30']]
+        docready_array = utils.data_rows_arr(data_array)
+
+        ###### This returns an array with all the data post processing. So docready_array[0] is INFO, docready_array[1] is stratification etc.
+        INFO = pd.DataFrame(docready_array[0])
+        Stratification = docready_array[1]
+        InputFileID = str(INFO.iloc[27,1])
+
+        ImportData = {'InputFileID': InputFileID, 
+                    'GeneralInfo': docready_array[1],
+                    'Stratification': docready_array[2],
+                    'Wall': docready_array[3],
+                    'Water': docready_array[4],
+                    'AddPress': docready_array[5],
+                    'Analyses': docready_array[6],
+                    'LoadComb': docready_array[7],
+                    'SheetPileAddOn': docready_array[8]}
     
+    
+
+        return ImportData
+    
+    def WallParameters(Wall): 
+        ############# WALL PARAMETERS
+        ### zT (Top wall)
+        
+        zT = float(format(float(Wall.iloc[1,0]), '.2f'))
+        
+        ### Mass of wall (for vertical equilibrium)
+        wall_mass = float(Wall.iloc[1,1])
+        
+        WallParams = {'zT': zT,
+                    'Mass': wall_mass}
+        
+        return WallParams
+
+
+    def WaterDensity(Water):
+    ######## WATER DENSITY    
+        gamma_water = float(format(float(Water.iloc[1,0]), '.2f'))
+        
+        return gamma_water
+    
+    def safe_value(val, default=0.0):
+        #returns val if number, else returns default
+        return val if isinstance(val, (int, float)) else default
+
+    def make_analysis_dict(Analyses, Analysis, ImportData, anchor_level, anchor_inclination, prescribed_anchor_force, vararr, geninfoarr):
+        return {
+                'AnalysisNo': geninfoarr[0],
+                'ParentAnalysis': geninfoarr[1],
+                'Project': str(ImportData.get('GeneralInfo').iloc[0,1]),
+                'Initials': str(ImportData.get('GeneralInfo').iloc[2,1]),
+                'Checker': str(ImportData.get('GeneralInfo').iloc[3,1]),
+                'Approver': str(ImportData.get('GeneralInfo').iloc[4,1]),
+                'Subject': Analyses.iloc[Analysis, 0],
+                'SoilProfile': Analyses.iloc[Analysis, 1],
+                'SlopeBack': None,
+                'SlopeFront': None,
+                'SoilLayersFront': [],
+                'SoilLayersBack': [],
+                'zT': float(utils.WallParameters(ImportData.get('Wall')).get('zT')),
+                'WallMass': float(utils.WallParameters(ImportData.get('Wall')).get('Mass')),
+                'WaterDensity': utils.WaterDensity(ImportData.get('Water')),
+                'AddPressureProfile': Analyses.iloc[Analysis, 11],
+                'AddPress_z': [],
+                'AddPress_ez': [],
+                'State': Analyses.iloc[Analysis, 2],
+                'WaterLevelFront': float(Analyses.iloc[Analysis, 3]),
+                'WaterLevelBack': float(Analyses.iloc[Analysis, 4]),
+                'WDiff': abs(float(Analyses.iloc[Analysis, 4]) - float(Analyses.iloc[Analysis, 4])),
+                'LoadCombination': Analyses.iloc[Analysis, 5],
+                'ConsequenceClass': Analyses.iloc[Analysis, 6],
+                'Alpha': float(Analyses.iloc[Analysis, 7]),
+                'LoadFront': float(Analyses.iloc[Analysis, 8]),
+                'LoadBack': float(Analyses.iloc[Analysis, 9]),
+                'LevelLoadBack': float(Analyses.iloc[Analysis, 10]),
+                'AxialWallLoad': float(Analyses.iloc[Analysis, 12]),
+                'iA': float(Analyses.iloc[Analysis, 13]),
+                'iB': float(Analyses.iloc[Analysis, 14]),
+                'iC': float(Analyses.iloc[Analysis, 15]),
+                'AnchorLevel': anchor_level,
+                'AnchorInclination': anchor_inclination,
+                'PrescrbAnchorForce': prescribed_anchor_force,
+                'zB': vararr['zB'],
+                'WD': vararr['WD'],
+                'CC': vararr['CC'],
+                'KN': Analyses.iloc[Analysis, 24],
+                'KP': Analyses.iloc[Analysis, 25],
+                'SC': Analyses.iloc[Analysis, 26],
+                'SheetPileAddOnInput': generators.GenerateSheetPileAddOnInput(ImportData.get('SheetPileAddOn'))
+            }

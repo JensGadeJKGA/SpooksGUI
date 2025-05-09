@@ -101,10 +101,6 @@ def TemporaryWorkingDirectory():
 
 def ImportExcel(input_path):
     
-    ## Libraries
-
-    
-    
     #### Loading excel workbook
     xlsx_filename=input_path
     with open(xlsx_filename, "rb") as f:

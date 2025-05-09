@@ -1,4 +1,6 @@
-from SpooksHelperLib.SoilProfiles import soilprofiles
+from SoilProfiles import soilprofiles
+from Analysis import analysisclass
+from Utils import utils
         
 class generators():
     def GenerateAddPressProfiles(Add_pres):
@@ -16,7 +18,7 @@ class generators():
         
         #### APn
         for i in range(9):
-            AdditionalPressures = Utils.AddPressProfiles(i+1, Add_pres, AdditionalPressures)
+            AdditionalPressures = utils.AddPressProfiles(i+1, Add_pres, AdditionalPressures)
         
         return AdditionalPressures
     
@@ -73,11 +75,132 @@ class generators():
         for i in range(10):
             sp = "SP"+str(i+1)
             soilprofile = soilprofiles.soilprofiles(sp, Stratification, SoilProfiles, [29*i,5], i)
-            soilprofiles.AppendToSoilProfiles(soilprofile[0], soilprofile[1], soilprofile[2], soilprofile[3], soilprofile[4], soilprofile[5])
+            soilprofiles.AppendToSoilProfiles(*soilprofile)
 
         #back soils    
         for i in range(10):
             soilprofile = soilprofiles.soilprofiles(sp, Stratification, SoilProfiles, [29*i,2], i)
-            soilprofiles.AppendToSoilProfiles(soilprofile[0], soilprofile[1], soilprofile[2], soilprofile[3], soilprofile[4], soilprofile[5])
+            soilprofiles.AppendToSoilProfiles(*soilprofile)
         
         return SoilProfiles
+    
+    def GeneratePartialCoefficientDictionary(LoadComb):
+        LoadCombinations = {'CC2': {},
+                            'CC3': {}}
+                
+        ### Find CC2 partial safety factors
+        LoadCombinations.get('CC2') = utils.PartialSafetyFactors(LoadComb, LoadCombinations, 'CC2')
+            
+        ### Find CC3 partial safety factors
+        LoadCombinations.get('CC3') = utils.PartialSafetyFactors(LoadComb, LoadCombinations, 'CC3')
+    
+    def GenerateAnalyses(input_path):
+
+        ## Importing Excel file
+        ImportData = utils.ImportExcel(input_path)
+        Analyses = ImportData.get('Analyses')
+
+        ## Check if input file version matches GUI version
+        InputFileStatus = utils.InputFileIDChecker(ImportData.get('InputFileID'))
+
+        if InputFileStatus == 'OK':
+            print("OK")
+
+            ## List holding analyses (output)
+            GeneratedAnalyses = []
+            geninfoarr = []
+            ## Initial analysis number
+            geninfoarr.append(0)  # geninfoarr[0]
+            ## Parent analysis (Referring to Excel input file)
+            geninfoarr.append(0)  # geninfoarr[1]
+
+            ### Ranges of analyses
+            RangeOfAnalyses = analysisclass.AnalysesRange(Analyses)
+            print(RangeOfAnalyses)
+            MinAnalysis = RangeOfAnalyses.get('MinAnalysis')
+            MaxAnalysis = RangeOfAnalyses.get('MaxAnalysis')
+
+            ### Defining correct number of decimals for integers and floating numbers
+            for Analysis in range(MinAnalysis, MaxAnalysis):
+                for i in range(0, len(Analyses.iloc[Analysis,:])):
+                    if isinstance(Analyses.iloc[Analysis,i], (int, float)):
+                        Analyses.iloc[Analysis,i] = float(format(Analyses.iloc[Analysis,i], '.2f'))
+
+            ### Generating analyses
+            for Analysis in range(MinAnalysis, MaxAnalysis):
+
+                # Define vararr as dict instead of list
+                vararr = {
+                    'zB': Analyses.iloc[Analysis,21],
+                    'WD': Analyses.iloc[Analysis,22],
+                    'CC': Analyses.iloc[Analysis,23]
+                }
+
+                # Handle invalid values
+                for key in vararr:
+                    if not isinstance(vararr[key], (int, float)):
+                        vararr[key] = None
+
+                if isinstance(Analyses.iloc[Analysis,16], (int, float)):
+                    AInclination = Analyses.iloc[Analysis,19]
+                    PrescrbAnchorForce = Analyses.iloc[Analysis,20]
+
+                    if not isinstance(AInclination, (int, float)):
+                        AInclination = 0.00
+                    if not isinstance(PrescrbAnchorForce, (int, float)):
+                        PrescrbAnchorForce = 0.00
+
+                    if Analyses.iloc[Analysis,16] != Analyses.iloc[Analysis,17] and Analyses.iloc[Analysis,18] is not None:
+                        for AnchorLevel in np.arange(
+                            Analyses.iloc[Analysis,16],
+                            Analyses.iloc[Analysis,17] + Analyses.iloc[Analysis,18],
+                            Analyses.iloc[Analysis,18]
+                        ):
+                            Analysis_dict = utils.make_analysis_dict(
+                                Analyses, Analysis, ImportData,
+                                AnchorLevel,
+                                AInclination,
+                                PrescrbAnchorForce,
+                                vararr,
+                                geninfoarr
+                            )
+                            print(Analysis_dict)
+                            GeneratedAnalyses.append(Analysis_dict)
+                            geninfoarr[0] += 1
+                    else:
+                        Analysis_dict = utils.make_analysis_dict(
+                            Analyses, Analysis, ImportData,
+                            Analyses.iloc[Analysis,16],
+                            AInclination,
+                            PrescrbAnchorForce,
+                            vararr,
+                            geninfoarr
+                        )
+                        print(Analysis_dict)
+                        GeneratedAnalyses.append(Analysis_dict)
+                        geninfoarr[0] += 1
+                else:
+                    Analysis_dict = utils.make_analysis_dict(
+                        Analyses, Analysis, ImportData,
+                        None,
+                        None,
+                        None,
+                        vararr,
+                        geninfoarr
+                    )
+                    print(Analysis_dict)
+                    GeneratedAnalyses.append(Analysis_dict)
+                    geninfoarr[0] += 1
+
+                geninfoarr[1] += 1
+
+            ## Append soil layers data to analysis dictionary
+            analysisclass.AddSoilToAnalysis(GeneratedAnalyses, generators.GenerateSoilProfiles(ImportData.get('Stratification')))
+
+            ## Append additional pressure profiles
+            analysisclass.AddPressureToAnalysis(GeneratedAnalyses, generators.GenerateAddPressProfiles(ImportData.get('AddPress')))
+
+            ## Append design parameters
+            analysisclass.AddDesignParameters(GeneratedAnalyses, ImportData.get('LoadComb'))
+
+            return GeneratedAnalyses
