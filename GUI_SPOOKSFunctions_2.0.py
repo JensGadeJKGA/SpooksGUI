@@ -303,51 +303,8 @@ def GenerateAddPressProfiles(Add_pres):
     ############# ADDITTIONAL PRESSURE PROFILES
     
     #### AP1
-    temp = Utils.AddPressProfiles(1, Add_pres, AdditionalPressures)
-    AdditionalPressures = temp
-
-    #### AP2
-    temp = Utils.AddPressProfiles(2, Add_pres, AdditionalPressures)
-    AdditionalPressures = temp
-        
-    #### AP3
-    temp = Utils.AddPressProfiles(3, Add_pres, AdditionalPressures)
-    AdditionalPressures = temp
-    
-    
-    #### AP4
-    temp = Utils.AddPressProfiles(4, Add_pres, AdditionalPressures)
-    AdditionalPressures = temp
-    
-    
-    #### AP5
-    temp = Utils.AddPressProfiles(5, Add_pres, AdditionalPressures)
-    AdditionalPressures = temp
-    
-    
-    #### AP6
-    temp = Utils.AddPressProfiles(6, Add_pres, AdditionalPressures)
-    AdditionalPressures = temp
-    
-    
-    #### AP7
-    temp = Utils.AddPressProfiles(7, Add_pres, AdditionalPressures)
-    AdditionalPressures = temp
-    
-    
-    #### AP8
-    temp = Utils.AddPressProfiles(8, Add_pres, AdditionalPressures)
-    AdditionalPressures = temp
-    
-    
-    #### AP9
-    temp = Utils.AddPressProfiles(9, Add_pres, AdditionalPressures)
-    AdditionalPressures = temp
-    
-    
-    #### AP10
-    temp = Utils.AddPressProfiles(10, Add_pres, AdditionalPressures)
-    AdditionalPressures = temp
+    for i in range(9):
+        AdditionalPressures = Utils.AddPressProfiles(i+1, Add_pres, AdditionalPressures)
     
     return AdditionalPressures
 

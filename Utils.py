@@ -84,7 +84,7 @@ class Utils:
             SoilProfiles.get(SoilProfile).get(Side).get('Layers').append(SoilLayer)
     
     def AddPressProfiles(APnum, Add_pres, AdditionalPressures):
-        AP = np.where((Add_pres.iloc[:,0]) == 'AP1')
+        AP = np.where((Add_pres.iloc[:,0]) == 'AP'+str(APnum))
         AP = AP[0]
         null = np.where(pd.isnull(Add_pres.iloc[:,1]))
         index_max = null[0][null[0] > AP] 
@@ -93,3 +93,5 @@ class Utils:
         for x in range(AP[0]+1,index_max):
             AdditionalPressures['AP'+str(APnum)]['z'].append(float(format(Add_pres.iloc[x,1],'.2f')))
             AdditionalPressures['AP'+str(APnum)]['ez'].append(float(format(Add_pres.iloc[x,2],'.2f')))
+    
+        return AdditionalPressures
