@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from SoilProfiles import soilprofiles
-from Utils import Utils
+from SpooksHelperLib.SoilProfiles import soilprofiles
+from SpooksHelperLib.Utils import Utils
 
 class Analysisclass():
     def AnalysesRange(Analyses):

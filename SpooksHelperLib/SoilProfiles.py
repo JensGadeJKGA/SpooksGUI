@@ -60,31 +60,4 @@ class soilprofiles():
             ## Append to soil profile dictionary
             SoilProfiles.get(SoilProfile).get(Side).get('Layers').append(SoilLayer)
 
-    def GenerateSoilProfiles(Stratification):
-        from SoilProfiles import soilprofiles
-        
-        SoilProfiles = {'SP1': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                        'SP2': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                        'SP3': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                        'SP4': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                        'SP5': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                        'SP6': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                        'SP7': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                        'SP8': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                        'SP9': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                        'SP10': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}}}
-
-
-        
-        #front soils
-        for i in range(10):
-            sp = "SP"+str(i+1)
-            soilprofile = soilprofiles.soilprofiles(sp, Stratification, SoilProfiles, [29*i,5], i)
-            soilprofiles.AppendToSoilProfiles(soilprofile[0], soilprofile[1], soilprofile[2], soilprofile[3], soilprofile[4], soilprofile[5])
-
-        #back soils    
-        for i in range(10):
-            soilprofile = soilprofiles.soilprofiles(sp, Stratification, SoilProfiles, [29*i,2], i)
-            soilprofiles.AppendToSoilProfiles(soilprofile[0], soilprofile[1], soilprofile[2], soilprofile[3], soilprofile[4], soilprofile[5])
-        
-        return SoilProfiles
+    

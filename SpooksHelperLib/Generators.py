@@ -1,4 +1,4 @@
-from SoilProfiles import soilprofiles
+from SpooksHelperLib.SoilProfiles import soilprofiles
         
 class generators():
     def GenerateAddPressProfiles(Add_pres):

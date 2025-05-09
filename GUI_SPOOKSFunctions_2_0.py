@@ -20,8 +20,9 @@
 
 
 ### Imports
-from Utils import Utils
-from SoilProfiles import soilprofiles
+from SpooksHelperLib.Utils import utils
+from SpooksHelperLib.Generators import generators
+from SpooksHelperLib.SoilProfiles import soilprofiles
 
 import numpy as np
 import pandas as pd
@@ -127,7 +128,7 @@ def ImportExcel(input_path):
 
     
     data_array = [INFO['A1':'H28'], GeneralInfo['A3':'B7'], Stratification['A4':'K289'], Wall['A3':'B5'], Water['A3':'A5'], Add_pres['A3':'C114'], Analyses['A3':'AA56'], LoadComb['A3':'M42'], SheetPileAddOn['A1':'G30']]
-    docready_array = Utils.data_rows_arr(data_array)
+    docready_array = utils.data_rows_arr(data_array)
 
     ###### This returns an array with all the data post processing. So docready_array[0] is INFO, docready_array[1] is stratification etc.
     INFO = pd.DataFrame(docready_array[0])
@@ -186,10 +187,10 @@ def GeneratePartialCoefficientDictionary(LoadComb):
                         'CC3': {}}
               
     ### Find CC2 partial safety factors
-    LoadCombinations.get('CC2') = Utils.PartialSafetyFactors(LoadComb, LoadCombinations, 'CC2')
+    LoadCombinations.get('CC2') = utils.PartialSafetyFactors(LoadComb, LoadCombinations, 'CC2')
         
     ### Find CC3 partial safety factors
-    LoadCombinations.get('CC3') = Utils.PartialSafetyFactors(LoadComb, LoadCombinations, 'CC3')
+    LoadCombinations.get('CC3') = utils.PartialSafetyFactors(LoadComb, LoadCombinations, 'CC3')
     
 
 def AnalysesRange(Analyses):
@@ -408,15 +409,15 @@ def GenerateAnalyses(input_path):
     Water = ImportData.get('Water')
     Wall = ImportData.get('Wall')
     Stratification = ImportData.get('Stratification')
-    SoilProfiles = soilprofiles.GenerateSoilProfiles(Stratification)
+    SoilProfiles = generators.GenerateSoilProfiles(Stratification)
     Add_pres = ImportData.get('AddPress')
-    AdditionalPressures = Utils.GenerateAddPressProfiles(Add_pres)
+    AdditionalPressures = generators.GenerateAddPressProfiles(Add_pres)
     LoadComb = ImportData.get('LoadComb')
     SheetPileAddOn = ImportData.get('SheetPileAddOn')
     
     
     ## Check if input file version matches GUI version
-    InputFileStatus = InputFileIDChecker(InputFileID)
+    InputFileStatus = utils.InputFileIDChecker(InputFileID)
     
     if InputFileStatus == 'OK':
         print("OK")
@@ -444,7 +445,7 @@ def GenerateAnalyses(input_path):
         TopWall = WallParams.get('zT')
         
         ### Sheet pile add on
-        SheetPileAddOnInput = Utils.GenerateSheetPileAddOnInput(SheetPileAddOn)
+        SheetPileAddOnInput = utils.GenerateSheetPileAddOnInput(SheetPileAddOn)
     
         
         
