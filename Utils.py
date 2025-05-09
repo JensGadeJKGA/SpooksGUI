@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from GUI_SPOOKSFunctions_2_0 import InputFileIDGUI, stat
 
 ###In this file you will find miscellaneous utility functions.
 
@@ -28,6 +29,20 @@ class Utils:
             return_array.append(data_rows)
         
         return return_array
+
+    def InputFileIDChecker(InputFileID):        
+        InputFileStatus = None
+        
+        if InputFileID == InputFileIDGUI:
+            
+            InputFileStatus = 'OK'
+            
+        else:
+            
+            stat.configure(text = 'Input file version does not match GUI version')
+            
+        return InputFileStatus
+
 
     ###This function calculates the additional pressures
     def AddPressProfiles(APnum, Add_pres, AdditionalPressures):
@@ -70,6 +85,24 @@ class Utils:
                 loadcombinations.get(cc)[str(Loadcombination)] = PartialSafetyFactors
         return loadcombinations
     
+    def GenerateAddPressProfiles(Add_pres):
+        
+        AdditionalPressures = {'AP1':{'z': [],'ez':[]},
+                            'AP2': {'z': [],'ez':[]},
+                            'AP3': {'z': [],'ez':[]},
+                            'AP4': {'z': [],'ez':[]},
+                            'AP5': {'z': [],'ez':[]},
+                            'AP6': {'z': [],'ez':[]},
+                            'AP7': {'z': [],'ez':[]},
+                            'AP8': {'z': [],'ez':[]},
+                            'AP9': {'z': [],'ez':[]},
+                            'AP10': {'z': [],'ez':[]}}
+        
+        #### APn
+        for i in range(9):
+            AdditionalPressures = Utils.AddPressProfiles(i+1, Add_pres, AdditionalPressures)
+        
+        return AdditionalPressures
     
     def GenerateSheetPileAddOnInput(SheetPileAddOn):
         

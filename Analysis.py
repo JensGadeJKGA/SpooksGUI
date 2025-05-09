@@ -1,7 +1,10 @@
 import numpy as np
 import pandas as pd
 
-class Analysis():
+from SoilProfiles import soilprofiles
+from Utils import Utils
+
+class Analysisclass():
     def AnalysesRange(Analyses):
         null = []
         # This loop aims for the first cell in which the user hasn't entered data in the following order (0: Subject text, 1: Soil profile, 2: Drained or undrained, 3: water front level, 4: water back level, 5: load comb, 6: consequence class, 7: alpha value, 8: front load value, 9: back load value, 10: zR value, 11 is missing, 12: iA value, 13: also iA value, 14: iC value)
@@ -13,7 +16,7 @@ class Analysis():
 
         
         ### Overall first row (analysis row) with incomplete data.
-        index_maxAnalysis = min(null)
+        index_maxAnalysis = min(*null)
         
         RangeOfAnalyses = {'MinAnalysis': 2,
                         'MaxAnalysis': index_maxAnalysis}
@@ -75,6 +78,7 @@ class Analysis():
 
 
     def AddDesignParameters(GeneratedAnalyses,LoadComb):
+        from Analysis import Analysisclass
         
         LoadCombinations = GeneratePartialCoefficientDictionary(LoadComb)
         
@@ -103,65 +107,11 @@ class Analysis():
             
             
             ## Generate design soil layers (back)
-            for SoilLayer in SoilLayersBack:
-                
-                TopLayer = float(SoilLayer.get('TopLayer'))
-                Gamma_d = float(SoilLayer.get('Gamma_d'))
-                Gamma_m = float(SoilLayer.get('Gamma_m'))
-                cu = float(SoilLayer.get('cu'))
-                c = float(SoilLayer.get('c'))
-                phi = float(SoilLayer.get('phi'))
-                i = float(SoilLayer.get('i'))
-                r = float(SoilLayer.get('r'))
-                Description = SoilLayer.get('Description')
-                KeepDrained = SoilLayer.get('KeepDrained')
-                
-                
-                DesignSoilLayer = {'TopLayer': TopLayer,
-                                'Gamma_d':  Gamma_d / (PartialSafetyFactors.get('f_gamb')**Alpha),
-                                'Gamma_m':  Gamma_m / (PartialSafetyFactors.get('f_gamb')**Alpha),
-                                'cu':       cu / (PartialSafetyFactors.get('f_cub')**Alpha),
-                                'c':        c / (PartialSafetyFactors.get('f_cb')**Alpha),
-                                'phi':      np.degrees(np.arctan(np.tan(np.radians(phi))/(PartialSafetyFactors.get('f_phib')**Alpha))),
-                                'i':        i,
-                                'r':        r,
-                                'Description': Description,
-                                'KeepDrained': KeepDrained}
-                
-                DesignSoilLayersBack.append(DesignSoilLayer)
-                
-            Analysis['DesignSoilLayersBack'] = DesignSoilLayersBack
+            Analysis['DesignSoilLayersBack'] = Analysisclass.SoilLayerAnalysis(SoilLayersBack, PartialSafetyFactors, Analysis, 'DesignSoilLayersBack')
             
             
             ## Generate design soil layers (front)
-            for SoilLayer in SoilLayersFront:
-                
-                TopLayer = float(SoilLayer.get('TopLayer'))
-                Gamma_d = float(SoilLayer.get('Gamma_d'))
-                Gamma_m = float(SoilLayer.get('Gamma_m'))
-                cu = float(SoilLayer.get('cu'))
-                c = float(SoilLayer.get('c'))
-                phi = float(SoilLayer.get('phi'))
-                i = float(SoilLayer.get('i'))
-                r = float(SoilLayer.get('r'))
-                Description = SoilLayer.get('Description')
-                KeepDrained = SoilLayer.get('KeepDrained')
-                
-                
-                DesignSoilLayer = {'TopLayer': TopLayer,
-                                'Gamma_d':  Gamma_d / (PartialSafetyFactors.get('f_gamf')**Alpha),
-                                'Gamma_m':  Gamma_m / (PartialSafetyFactors.get('f_gamf')**Alpha),
-                                'cu':       cu / (PartialSafetyFactors.get('f_cuf')**Alpha),
-                                'c':        c / (PartialSafetyFactors.get('f_cf')**Alpha),
-                                'phi':      np.degrees(np.arctan(np.tan(np.radians(phi))/(PartialSafetyFactors.get('f_phif')**Alpha))),
-                                'i':        i,
-                                'r':        r,
-                                'Description': Description,
-                                'KeepDrained': KeepDrained}
-                
-                DesignSoilLayersFront.append(DesignSoilLayer)
-            
-            Analysis['DesignSoilLayersFront'] = DesignSoilLayersFront
+            Analysis['DesignSoilLayersFront'] = Analysisclass.SoilLayerAnalysis(SoilLayersFront, PartialSafetyFactors, Analysis, 'DesignSoilLayersFront')
             
             
             
@@ -180,14 +130,9 @@ class Analysis():
             
             ################## LOADS AND WATER DENSITY ###########################
             
-            
-            DesignLoadFront = float(LoadFront)*float(PartialSafetyFactors.get('f_qf'))
-            DesignLoadBack = float(LoadBack)*float(PartialSafetyFactors.get('f_qb'))
-            DesignWaterDensity = float(WaterDensity)*float(PartialSafetyFactors.get('f_wat'))
-            
-            Analysis['DesignLoadFront'] = DesignLoadFront
-            Analysis['DesignLoadBack'] = DesignLoadBack
-            Analysis['DesignWaterDensity'] = DesignWaterDensity
+            Analysis['DesignLoadFront'] = float(LoadFront)*float(PartialSafetyFactors.get('f_qf'))
+            Analysis['DesignLoadBack'] = float(LoadBack)*float(PartialSafetyFactors.get('f_qb'))
+            Analysis['DesignWaterDensity'] = float(WaterDensity)*float(PartialSafetyFactors.get('f_wat'))
             Analysis['PartialSafetyFactors'] = PartialSafetyFactors
         
         
@@ -204,13 +149,13 @@ class Analysis():
         Stratification = ImportData.get('Stratification')
         SoilProfiles = soilprofiles.GenerateSoilProfiles(Stratification)
         Add_pres = ImportData.get('AddPress')
-        AdditionalPressures = GenerateAddPressProfiles(Add_pres)
+        AdditionalPressures = Utils.GenerateAddPressProfiles(Add_pres)
         LoadComb = ImportData.get('LoadComb')
         SheetPileAddOn = ImportData.get('SheetPileAddOn')
         
         
         ## Check if input file version matches GUI version
-        InputFileStatus = InputFileIDChecker(InputFileID)
+        InputFileStatus = Utils.InputFileIDChecker(InputFileID)
         
         if InputFileStatus == 'OK':
             print("OK")
@@ -471,3 +416,35 @@ class Analysis():
             
         
             return GeneratedAnalyses
+    
+    def SoilLayerAnalysis(SoilLayers, PartialSafetyFactors, Analysis, Analysisspot):
+        DesignSoilLayers = None
+        for SoilLayer in SoilLayers:
+                
+            TopLayer = float(SoilLayer.get('TopLayer'))
+            Gamma_d = float(SoilLayer.get('Gamma_d'))
+            Gamma_m = float(SoilLayer.get('Gamma_m'))
+            cu = float(SoilLayer.get('cu'))
+            c = float(SoilLayer.get('c'))
+            phi = float(SoilLayer.get('phi'))
+            i = float(SoilLayer.get('i'))
+            r = float(SoilLayer.get('r'))
+            Description = SoilLayer.get('Description')
+            KeepDrained = SoilLayer.get('KeepDrained')
+                
+                
+            DesignSoilLayer = {'TopLayer': TopLayer,
+                            'Gamma_d':  Gamma_d / (PartialSafetyFactors.get('f_gamb')**Alpha),
+                            'Gamma_m':  Gamma_m / (PartialSafetyFactors.get('f_gamb')**Alpha),
+                            'cu':       cu / (PartialSafetyFactors.get('f_cub')**Alpha),
+                            'c':        c / (PartialSafetyFactors.get('f_cb')**Alpha),
+                            'phi':      np.degrees(np.arctan(np.tan(np.radians(phi))/(PartialSafetyFactors.get('f_phib')**Alpha))),
+                            'i':        i,
+                            'r':        r,
+                            'Description': Description,
+                            'KeepDrained': KeepDrained}
+                
+            DesignSoilLayers.append(DesignSoilLayer)
+            
+        Analysis[Analysisspot] = DesignSoilLayers
+        return Analysis[Analysisspot]

@@ -79,19 +79,6 @@ def log_usage():
 
 ################### FUNCTIONS ####################################
 
-def InputFileIDChecker(InputFileID):
-    
-    InputFileStatus = None
-    
-    if InputFileID == InputFileIDGUI:
-        
-        InputFileStatus = 'OK'
-        
-    else:
-        
-        stat.configure(text = 'Input file version does not match GUI version')
-        
-    return InputFileStatus
 
 
         
@@ -189,27 +176,7 @@ def WallParameters(Wall):
 
 
 
-def GenerateAddPressProfiles(Add_pres):
-    
-    AdditionalPressures = {'AP1':{'z': [],'ez':[]},
-                           'AP2': {'z': [],'ez':[]},
-                           'AP3': {'z': [],'ez':[]},
-                           'AP4': {'z': [],'ez':[]},
-                           'AP5': {'z': [],'ez':[]},
-                           'AP6': {'z': [],'ez':[]},
-                           'AP7': {'z': [],'ez':[]},
-                           'AP8': {'z': [],'ez':[]},
-                           'AP9': {'z': [],'ez':[]},
-                           'AP10': {'z': [],'ez':[]}}
-    
-    
-    ############# ADDITTIONAL PRESSURE PROFILES
-    
-    #### AP1
-    for i in range(9):
-        AdditionalPressures = Utils.AddPressProfiles(i+1, Add_pres, AdditionalPressures)
-    
-    return AdditionalPressures
+
 
 
 
@@ -443,7 +410,7 @@ def GenerateAnalyses(input_path):
     Stratification = ImportData.get('Stratification')
     SoilProfiles = soilprofiles.GenerateSoilProfiles(Stratification)
     Add_pres = ImportData.get('AddPress')
-    AdditionalPressures = GenerateAddPressProfiles(Add_pres)
+    AdditionalPressures = Utils.GenerateAddPressProfiles(Add_pres)
     LoadComb = ImportData.get('LoadComb')
     SheetPileAddOn = ImportData.get('SheetPileAddOn')
     
