@@ -21,6 +21,7 @@
 
 ### Imports
 from Utils import Utils
+from SoilProfiles import soilprofiles
 
 import numpy as np
 import pandas as pd
@@ -158,104 +159,6 @@ def ImportExcel(input_path):
     
 
     return ImportData
-
-
-
-
-
-
-
-
-
-def GenerateSoilProfiles(Stratification):
-    
-    SoilProfiles = {'SP1': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                    'SP2': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                    'SP3': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                    'SP4': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                    'SP5': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                    'SP6': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                    'SP7': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                    'SP8': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                    'SP9': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                    'SP10': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}}}
-
-
-    
-    ################### FRONT SOILS
-    for i in range(10):
-        sp = "SP"+str(i+1)
-        Utils.AppendToSoilProfiles(Utils.soilprofiles(sp, Stratification, SoilProfiles, [29*i,5], i))
-
-    #### Soil profile 1
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP1', Stratification, SoilProfiles, [0,5], 0))
-
-    #### Soil profile 2
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP2', Stratification, SoilProfiles, [28,5], 1))
-    
-    #### Soil profile 3
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP3', Stratification, SoilProfiles, [56,5], 2))
-    
-    #### Soil profile 4
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP4', Stratification, SoilProfiles, [85,5], 3))
-    
-    #### Soil profile 5
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP5', Stratification, SoilProfiles, [114,5], 4))
-    
-    #### Soil profile 6
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP6', Stratification, SoilProfiles, [143,5], 5))        
-                
-    #### Soil profile 7
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP7', Stratification, SoilProfiles, [172,5], 6))
-    
-    #### Soil profile 8
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP8', Stratification, SoilProfiles, [201,5], 7))
-
-    #### Soil profile 9
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP9', Stratification, SoilProfiles, [230,5], 8))
-    
-    #### Soil profile 10
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP8', Stratification, SoilProfiles, [259,5], 8))
-
-
-    # ############# BACK SOILS
-    
-    for i in range(10):
-        sp = "SP"+str(i+1)
-        Utils.AppendToSoilProfiles(Utils.soilprofiles(sp, Stratification, SoilProfiles, [29*i,2], i))
-
-    #### Soil profile 1
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP1', Stratification, SoilProfiles, [0,2], 0))
-    
-    #### Soil profile 2
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP2', Stratification, SoilProfiles, [28,2], 1))
-    
-    #### Soil profile 3
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP3', Stratification, SoilProfiles, [56,2], 2))
-    
-    #### Soil profile 4
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP4', Stratification, SoilProfiles, [85,2], 3))
-    
-    #### Soil profile 5
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP5', Stratification, SoilProfiles, [114,2], 4))
-
-    #### Soil profile 6
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP6', Stratification, SoilProfiles, [143,2], 6))
-    
-    #### Soil profile 7
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP7', Stratification, SoilProfiles, [172,2], 7))
-
-    #### Soil profile 8
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP8', Stratification, SoilProfiles, [201,2], 8))
-
-    #### Soil profile 9
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP9', Stratification, SoilProfiles, [231,2], 9))
-    
-    #### Soil profile 10
-    #Utils.AppendToSoilProfiles(Utils.soilprofiles('SP9', Stratification, SoilProfiles, [259,2], 10))
-    
-    return SoilProfiles
-    
     
     
 def WaterDensity(Water):
@@ -632,7 +535,7 @@ def GenerateAnalyses(input_path):
     Water = ImportData.get('Water')
     Wall = ImportData.get('Wall')
     Stratification = ImportData.get('Stratification')
-    SoilProfiles = GenerateSoilProfiles(Stratification)
+    SoilProfiles = soilprofiles.GenerateSoilProfiles(Stratification)
     Add_pres = ImportData.get('AddPress')
     AdditionalPressures = GenerateAddPressProfiles(Add_pres)
     LoadComb = ImportData.get('LoadComb')
