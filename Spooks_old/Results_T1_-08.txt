@@ -1,0 +1,11 @@
+Analysis No.;Subject;Soil Profile;State;Load Combination;AnchorLevel;AnchorForce;Moment at Anchor Level;Level of Max. Moment;Max. Moment;Encastre Level;Encastre Moment;Yield Level;Yield Moment;Max. Shear Force;Toe Level;Sum of vertical forces;Profile;Max utilization;Lvl of Max utilization
+0;T1, LB3, Dr, Dom. flade, 30 kPa;SP1;Drained;Dom. Fladelast;0.25;389.93;-239.49;-5.829;330.851;N/A;N/A;-5.829;330.85;213.401;-11.514;-9.943735230448214;AZ 12-700;0.93;-5.829
+1;T1, LB3, Dr, Dom. VS, m. flade 30 kPa;SP2;Drained;Dom. Vandspejl;0.25;355.02;-195.83;-5.7;398.67;N/A;N/A;-5.7;398.67;-180.391;-11.676;-2.414447412777017;AZ 13-700-10/10;0.91;-5.7
+2;T1, LB3, Dr, Dom. Pullert, m. flade 30 kPa;SP1;Drained;Dom. Pullert;0.25;347.73;-216.63;-5.785;308.302;N/A;N/A;-5.785;308.3;185.346;-11.366;-4.684488273585908;AZ 12-700;0.87;-5.785
+3;T1, LB3, Dr. Dom. VS, Flade i AK, 0 AP;SP3;Drained;Dom. Vandspejl;0.25;245.49;-72.21;-5.397;461.315;N/A;N/A;-5.397;461.31;-169.85;-11.767;5.301135916708271;AZ 17-700;0.9;-5.397
+4;T1, LB3, Dr. Dom. Flade i AK, 0 AP;SP4;Drained;Dom. Fladelast;0.25;235.04;-71.85;-5.377;414.97;N/A;N/A;-5.377;414.97;-157.697;-11.654;2.845079619048038;AZ 14-700;0.88;-5.377
+5;T1, LB3, Dr, Dom. flade, 20 kPa;SP1;Drained;Dom. Fladelast;0.25;329.03;-190.41;-5.714;317.448;N/A;N/A;-5.714;317.45;170.265;-11.375;-2.128248785423141;AZ 12-700;0.89;-5.714
+6;T1, LB3, Dr, Dom. VS, m. flade 20 kPa;SP2;Drained;Dom. Vandspejl;0.25;313.04;-161.51;-5.619;388.065;N/A;N/A;-5.619;388.07;-168.051;-11.58;4.924129399869539;AZ 13-700;0.95;-5.619
+7;T1, LB3, Dr, Dom. Pullert, m. flade 20 kPa;SP1;Drained;Dom. Pullert;0.25;305.32;-182.3;-5.7;299.198;N/A;N/A;-5.7;299.2;155.317;-11.267;0.8135855616790746;AZ 12-700;0.84;-5.7
+8;T1, LB3, Dr. Dom. VS, Flade i AK, 0 AP;SP3;Drained;Dom. Vandspejl;0.25;235.05;-72.13;-5.386;431.93;N/A;N/A;-5.386;431.93;-160.002;-11.639;4.250239486046521;AZ 14-700;0.92;-5.386
+9;T1, LB3, Dr. Dom. Flade i AK, 0 AP;SP4;Drained;Dom. Fladelast;0.25;220.74;-71.77;-5.365;375.146;N/A;N/A;-5.365;375.15;-144.179;-11.468;0.08737239739434166;AZ 13-700;0.92;-5.365
