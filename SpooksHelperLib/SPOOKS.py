@@ -2,8 +2,14 @@
 from datetime import datetime
 import os
 import subprocess
+from SpooksHelperLib.Generators import generators
 from SpooksHelperLib.Utils import utils
 from SpooksHelperLib.SoilProfiles import soilprofiles
+
+from tkinter import ttk
+from tkinter import filedialog
+import tkinter as tk
+import tkinter.scrolledtext as tkst
 
 class spooksfile():
     def anchorLevel(Anchorlevel, PrescrbAnchorForce, anchCoeffVars):
@@ -305,3 +311,27 @@ class spooksfile():
             'EarthPressureResults': EarthPressureResults,
             'Results': Results
         }
+    
+    def SPOOKSFeeder(self,input_path,calcno,pb,tabcalc,logtxt,tk):
+        FeederOutput = [] 
+        GeneratedAnalyses = generators.GenerateAnalyses(input_path)
+        
+        ## Progress bar maximum
+        pb['maximum'] = len(GeneratedAnalyses)-1
+        pb.update() ## update progress bar
+        
+        ## Loop through all generated analyses and append output to FeederOutput
+        for Analysis in GeneratedAnalyses:
+            #print(Analysis)
+            
+            ### PROGRESS BAR AND CALCULATION NO UPDATE
+            calcno.configure(text = str(Analysis.get('AnalysisNo'))) ## Calculation number for GUI
+            tabcalc.update_idletasks()
+            pb['value'] = Analysis.get('AnalysisNo')
+            pb.update() ## update progress bar                
+            
+            FeederOutput.append({'FeedAnalysis': Analysis,
+                                'ExecuteOutput': self.ExecuteSPOOKS(Analysis,logtxt,tk), #Executeoutput
+                                'GetResultsOutput': self.GetResults(self.ExecuteSPOOKS(Analysis,logtxt,tk))}) #Getresults from Executeoutput
+            
+        return FeederOutput

@@ -1,6 +1,9 @@
 import pandas as pd
 import numpy as np
 import os
+import io
+from scipy.interpolate import interp1d
+from openpyxl import load_workbook
 
 from GUI_SPOOKSFunctions_2_0 import InputFileIDGUI, stat
 from SpooksHelperLib.Generators import generators
@@ -337,3 +340,24 @@ class utils:
         maxmomlvl = momentlevel[moment_index]
 
         return maxshear, maxshearlevel, maxmom, maxmomlvl
+
+    def interpolate_moment_curve(plot_levels, moments):
+        """
+        Performs quadratic interpolation on the moment curve.
+        """
+        level_plot_unique = []
+        m_plot_unique = []
+        for i in range(len(plot_levels) - 1):
+            if plot_levels[i] != plot_levels[i + 1]:
+                level_plot_unique.append(plot_levels[i])
+                m_plot_unique.append(moments[i])
+
+        level_plot_unique.append(plot_levels[-1])
+        m_plot_unique.append(moments[-1])
+
+        x = np.asarray(level_plot_unique)
+        y = np.asarray(m_plot_unique)
+        m_curve = interp1d(x, y, kind='quadratic', fill_value="extrapolate")
+        curve_level = np.linspace(min(level_plot_unique), max(level_plot_unique), 100)
+
+        return m_curve, curve_level

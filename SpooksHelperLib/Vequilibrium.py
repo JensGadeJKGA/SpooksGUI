@@ -13,7 +13,7 @@ class verticalEquilibrium():
             retarr.append(soil.get('Toplayer'))
         groundlevel = max(retarr)
         
-        return(retarr,groundlevel)
+        return retarr,groundlevel
         
 
         #Parameters:
