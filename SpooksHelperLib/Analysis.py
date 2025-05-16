@@ -108,11 +108,6 @@ class analysisclass():
             Analysis['DesignLoadBack'] = float(Analysis.get('LoadBack'))*float(PartialSafetyFactors.get('f_qb'))
             Analysis['DesignWaterDensity'] = float(Analysis.get('WaterDensity'))*float(PartialSafetyFactors.get('f_wat'))
             Analysis['PartialSafetyFactors'] = PartialSafetyFactors
-        
-        
-
-    
-
     
     def SoilLayerAnalysis(SoilLayers, PartialSafetyFactors, Analysis, Analysisspot):
         DesignSoilLayers = None
@@ -145,54 +140,3 @@ class analysisclass():
             
         Analysis[Analysisspot] = DesignSoilLayers
         return Analysis[Analysisspot]
-    
-    def AddSoilToAnalysis(GeneratedAnalyses,SoilProfiles):
-    
-        ## Loop through all generated analyses and append stratigraphy input
-        for Analysis in GeneratedAnalyses:
-            
-            SoilProfile = Analysis.get('SoilProfile')
-            
-            ## Find analysis soil profile in SoilProfiles
-            SP = SoilProfiles.get(SoilProfile)
-            
-            ## Append slope back
-            Analysis['SlopeBack'] = SP.get('Back').get('Slope')
-            
-            ## Append slope front
-            Analysis['SlopeFront'] = SP.get('Front').get('Slope')
-            
-            ## Append soil profile properties (back)
-            for SoilLayer in SP.get('Back').get('Layers'):
-            
-                    Analysis.get('SoilLayersBack').append(SoilLayer)
-                    
-            ## Append soil profile properties (front)
-            for SoilLayer in SP.get('Front').get('Layers'):
-            
-                    Analysis.get('SoilLayersFront').append(SoilLayer)
-            
-
-
-    def AddPressureToAnalysis(GeneratedAnalyses,AdditionalPressures):
-        
-        ## Loop through all generated analyses and append stratigraphy input
-        for Analysis in GeneratedAnalyses:
-            
-            APProfile = Analysis.get('AddPressureProfile')
-            
-            ## If any of the possible additional pressure profiles is specified
-            if APProfile != None:
-                
-                ## Additional pressure profile
-                APProfile = AdditionalPressures.get(APProfile)
-            
-                ## Append AP levels
-                for Level in APProfile.get('z'):
-                
-                        Analysis.get('AddPress_z').append(Level)
-                
-                ## Append AP pressures
-                for Pressure in APProfile.get('ez'):
-                
-                        Analysis.get('AddPress_ez').append(Pressure)

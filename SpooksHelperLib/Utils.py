@@ -157,6 +157,17 @@ class utils:
     def safe_value(val, default=0.0):
         #returns val if number, else returns default
         return val if isinstance(val, (int, float)) else default
+    
+    
+    def GeneratePartialCoefficientDictionary(LoadComb):
+        LoadCombinations = {'CC2': {},
+                            'CC3': {}}
+                
+        ### Find CC2 partial safety factors
+        LoadCombinations.get('CC2') = utils.PartialSafetyFactors(LoadComb, LoadCombinations, 'CC2')
+            
+        ### Find CC3 partial safety factors
+        LoadCombinations.get('CC3') = utils.PartialSafetyFactors(LoadComb, LoadCombinations, 'CC3')
 
     def make_analysis_dict(Analyses, Analysis, ImportData, anchor_level, anchor_inclination, prescribed_anchor_force, vararr, geninfoarr):
         return {
