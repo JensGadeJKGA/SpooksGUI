@@ -4,7 +4,44 @@ from SpooksHelperLib.Utils import utils
 from SpooksHelperLib.SoilProfiles import soilprofiles
 
 class spooksfile():
-    def GenerateSPOOKSInputFile(Analysis):
+    def anchorLevel(Anchorlevel, PrescrbAnchorForce, anchCoeffVars):
+        baseArr = [format(anchCoeffVars["iA"],'.2f'), 
+                        format(anchCoeffVars["iB"],'.2f'),
+                        format(anchCoeffVars["iC"],'.2f'), 
+                        format(anchCoeffVars["zT"],'.2f'), 
+                        format(anchCoeffVars["zR"],'.2f')]
+        
+        ## If no anchor
+        if Anchorlevel == None: 
+
+            if format(anchCoeffVars["iB"],'.2f') != '1.00' or format(anchCoeffVars["iB"],'.2f') != '0.00':
+                print('No compatibility between failure mode and failure coefficients')
+                return ['N/A', 
+                            'N/A',
+                            'N/A', 
+                            'N/A', 
+                            'N/A']
+            else:
+                return baseArr
+        
+        # if anchor and no prescribed anchor force
+        elif Anchorlevel != None and PrescrbAnchorForce == 0.00: 
+            baseArr.append(format(Anchorlevel,'.2f'))
+
+            return baseArr
+        
+        # if anchor and prescribed anchor force
+        elif Anchorlevel != None and PrescrbAnchorForce != 0.00 and format(anchCoeffVars["iC"],'.2f') == '0.00' and float(anchCoeffVars["iB"]) > 0: 
+            baseArr.append(format(Anchorlevel,'.2f'))
+            baseArr.append(format(PrescrbAnchorForce,'.2f'))
+
+            return baseArr
+        
+        
+           
+        
+
+    def GenerateSPOOKSInputFile(self, Analysis):
 
         Project = Analysis.get('Project')
         Initials = Analysis.get('Initials')
@@ -70,92 +107,18 @@ class spooksfile():
         L=soilprofiles.designsoillayer(DesignSoilLayersBack, State, L)
         
         ################## FAILURE MODE (ANCHOR COEFFICIENTS) ###################
-        
-        
-        ## If no anchor
-        if AnchorLevel == None: 
-
-            if format(iB,'.2f') != '1.00' or format(iC,'.2f') != '0.00':
-                print('No compatibility between failure mode and failure coefficients')
-            
-                Coeff_temp = ['N/A', 
-                            'N/A',
-                            'N/A', 
-                            'N/A', 
-                            'N/A']
-            else:
-                
-                Coeff_temp = [format(iA,'.2f'), 
-                            format(iB,'.2f'),
-                            format(iC,'.2f'), 
-                            format(zT,'.2f'), 
-                            format(zR,'.2f')]
-            
-            Coeff = ""
-        
-            for item in Coeff_temp: # creates the right amount of space between columns
-                if len(item) == 4:
-                    space = '      ' # 6 spaces
-                if len(item) == 5:
-                    space = '     '  # 5 spaces
-                if len(item) == 6:
-                    space = '    '   # 4 spaces
-                Coeff += space + item
-                
-            Endspace = '                    ' ## 20 end spaces (if no anchor)
-            
-            L.append(Coeff+Endspace)
-            
-        # if anchor and no prescribed anchor force
-        elif AnchorLevel != None and PrescrbAnchorForce == 0.00: 
-        
-            Coeff_temp = [format(iA,'.2f'), 
-                        format(iB,'.2f'),
-                        format(iC,'.2f'), 
-                        format(zT,'.2f'), 
-                        format(zR,'.2f'),
-                        format(AnchorLevel,'.2f')]
-        
-            Coeff = ""
-        
-            for item in Coeff_temp: # creates the right amount of space between columns
-                if len(item) == 4:
-                    space = '      ' # 6 spaces
-                if len(item) == 5:
-                    space = '     '  # 5 spaces
-                if len(item) == 6:
-                    space = '    '   # 4 spaces
-                Coeff += space + item
-                
-            Endspace = '          ' ## 10 end spaces (if anchor but no prescribed force)
-            
-            L.append(Coeff+Endspace)
-            
-        
-        # if anchor and prescribed anchor force
-        elif AnchorLevel != None and PrescrbAnchorForce != 0.00 and format(iC,'.2f') == '0.00' and float(iB) > 0: 
-        
-            Coeff_temp = [format(iA,'.2f'), 
-                        format(iB,'.2f'),
-                        format(iC,'.2f'), 
-                        format(zT,'.2f'), 
-                        format(zR,'.2f'),
-                        format(AnchorLevel,'.2f'),
-                        format(PrescrbAnchorForce,'.2f')]
-        
-            Coeff = ""
-        
-            for item in Coeff_temp: # creates the right amount of space between columns
-                if len(item) == 4:
-                    space = '      ' # 6 spaces
-                if len(item) == 5:
-                    space = '     '  # 5 spaces
-                if len(item) == 6:
-                    space = '    '   # 4 spaces
-                Coeff += space + item
-            
-            L.append(Coeff)
-        
+        AnchCoeffVars = {
+            "iA": iA,
+            "iB": iB,
+            "iC": iC,
+            "zT": zT,
+            "zR": zR
+        }
+        Coeff_temp = self.anchorLevel(AnchorLevel, PrescrbAnchorForce, AnchCoeffVars)
+        Coeff = utils.AddSpaces(Coeff_temp)
+        L.append(Coeff)
+        if AnchorLevel == None:
+            L.append('                    ')
         
         ############ KING POST WALL PARAMETERS (if data is properly entered in excel input file)
             
@@ -166,19 +129,9 @@ class spooksfile():
                             format(CC,'.2f')]
             
             KingPostParam = ""
-        
-            for item in KingPost_temp: # creates the right amount of space between columns
-                if len(str(item)) == 4:
-                    space = '      ' # 6 spaces
-                if len(str(item)) == 5:
-                    space = '     '  # 5 spaces
-                if len(str(item)) == 6:
-                    space = '    '   # 4 spaces
-                KingPostParam += space + str(item)
-                
-            Initspace = '                                        ' ## 40 inital spaces
-            
-            L.append(Initspace+KingPostParam)
+
+            KingPostParam = utils.AddSpaces(KingPost_temp)
+            L.append('                                        ' + KingPostParam) #+40 init spaces
         
         elif zB == None and WD == None and CC == None:
             
@@ -207,36 +160,12 @@ class spooksfile():
             addpressfile = []
         
             
-            APlevel = ""
-        
-            for item in AddPress_z: # creates the right amount of space between columns
-
-                item = format(float(item),'.2f')
-                
-                if len(item) == 4:
-                    space = '      ' # 6 spaces
-                if len(item) == 5:
-                    space = '     '  # 5 spaces
-                if len(item) == 6:
-                    space = '    '   # 4 spaces
-                APlevel += space + item
+            APlevel = utils.AddSpaces(AddPress_z)
             
             addpressfile.append(APlevel+'    ')
             addpressfile.append('  ')
             
-            APvalue = ""
-        
-            for item in AddPress_ez: # creates the right amount of space between columns
-                
-                item = format(float(item),'.2f')
-
-                if len(item) == 4:
-                    space = '      ' # 6 spaces
-                if len(item) == 5:
-                    space = '     '  # 5 spaces
-                if len(item) == 6:
-                    space = '    '   # 4 spaces
-                APvalue += space + item
+            APvalue = utils.AddSpaces(AddPress_ez)
             
             addpressfile.append(APvalue+'    ')
             

@@ -1,4 +1,5 @@
 import pandas as pd
+from SpooksHelperLib.Utils import utils
 import numpy as np
 
 
@@ -60,7 +61,7 @@ class soilprofiles():
             ## Append to soil profile dictionary
             SoilProfiles.get(SoilProfile).get(Side).get('Layers').append(SoilLayer)
 
-    def designsoillayer(DesignSoilLayers, State):
+    def designsoillayer(DesignSoilLayers, State, L):
         for Layer in DesignSoilLayers:  # creates lines for soil on front
             
             if State.lower() == 'undrained' and Layer.get('KeepDrained') == 'No':
@@ -84,18 +85,12 @@ class soilprofiles():
                         format(Layer.get('r'),'.2f')]
                 
         
-            SoilFront = ""
+            Soil = ""
         
-            for item in S_temp: # creates the right amount of space between columns
-                if len(item) == 4:
-                    space = '      ' # 6 spaces
-                if len(item) == 5:
-                    space = '     '  # 5 spaces
-                if len(item) == 6:
-                    space = '    '   # 4 spaces
-                SoilFront += space + item
-            
-            L.append(SoilFront)
+            Soil = utils.AddSpaces(S_temp)
+            L.append(Soil)
         
         L.append('>')
         L.append('<')
+
+        return L

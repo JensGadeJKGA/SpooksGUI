@@ -228,15 +228,17 @@ class utils:
                 'SheetPileAddOnInput': generators.GenerateSheetPileAddOnInput(ImportData.get('SheetPileAddOn'))
             }
     
-    def AddSpaces(item):
-        if len(item) == 4:
-            space = '      ' # 6 spaces
-        if len(item) == 5:
-            space = '     '  # 5 spaces
-        if len(item) == 6:
-            space = '    '   # 4 spaces
-        
-        return space+item
+    def AddSpaces(items):
+        returnitem = ""
+        for item in items:
+            if len(item) == 4:
+                space = '      ' # 6 spaces
+            if len(item) == 5:
+                space = '     '  # 5 spaces
+            if len(item) == 6:
+                space = '    '   # 4 spaces
+            returnitem += (space+item)
+        return returnitem
 
             
         
