@@ -240,5 +240,100 @@ class utils:
             returnitem += (space+item)
         return returnitem
 
-            
+    def linesplitter(lines, check, checkTwo=None, indice=0):
+        for line in lines:
+            if check in line or (checkTwo and checkTwo in line):
+                parts = line.split()
+                try:
+                    return float(parts[indice])
+                except (IndexError, ValueError):
+                    return 'N/A'
+        return 'N/A'
+    
+    def linesplitterMult(self,lines,checks,checkTwos,indices):
+        if not (len(checks) == len(checkTwos) == len(indices)):
+            raise ValueError("checks, checkTwos, and indices must all be the same length.")
         
+        results = []
+        for check, checkTwo, idx in zip(checks, checkTwos, indices):
+            result = self.linesplitter(lines, check, checkTwo, idx)
+            results.append(result)
+        return results
+    
+    # Extracts key structural results from the raw SPOOKS output using defined headers and offsets
+    def parse_result_variables(self,ExecuteOutput):
+        checkArr = ['ENCASTRE LEVEL', 'ENCASTRE MOMENT', 'LEVEL OF YIELD HINGE', 'MOMENT IN YIELD HINGE', 'FOOT LEVEL', 'ANCHOR FORCE', 'MOMENT AT ANCHOR']
+        checkTwoArr = [None, None, None, None, 'LEVEL OF FOOT', None, None]
+        iArr = [-1,-2,-1,-2,-1,-4,-2]
+        return self.linesplitterMult(ExecuteOutput.get('SPOOKSOutput'), checkArr, checkTwoArr, iArr)
+
+    # Reads the SPOOKS plot file (usually a text file) and returns a list of its lines
+    def read_plot_file_lines(ExecuteOutput):
+        with open(ExecuteOutput.get('SPOOKSPlotFile'), 'r') as f:
+            return f.readlines()
+
+    # Isolates the section of the file that contains earth pressure data
+    def extract_earth_pressure_block(lines):
+        index_header = next(i for i, line in enumerate(lines) if 'Kote' in line)
+        index_empty = [i for i, line in enumerate(lines) if line.isspace() and i > index_header]
+
+        boundary_low = index_empty[0] if index_empty else len(lines)
+        return lines[index_header:boundary_low]
+
+    # Parses the earth pressure block and organizes data into arrays
+    def parse_earth_pressure_block(block_lines):
+        EarthPressureResults = np.empty((0, 8), int)  # Raw matrix of all values
+
+        # Initialize empty lists for individual result columns
+        level_graphic, e1_graphic, e2_graphic = [], [], []
+        dw_graphic, enet_graphic = [], []
+        shearforce, shearlevel = [], []
+        moment, momentlevel = [], []
+        ju_graphic = []
+
+        for line in block_lines:
+            if 'T' in line:  # Skip header row
+                continue
+
+            # Split line into values and reshape to keep as row vector
+            splitstrings = np.array(line.split()).reshape((1, -1))
+            EarthPressureResults = np.append(EarthPressureResults, splitstrings, axis=0)
+
+            # Parse and assign each value to its corresponding array
+            level = float(splitstrings[:, 0])
+            level_graphic.append(level)
+            e1_graphic.append(float(splitstrings[:, 1]) * -1)  # Negate for graph orientation
+            e2_graphic.append(float(splitstrings[:, 2]))
+            dw_graphic.append(float(splitstrings[:, 3]))
+            enet_graphic.append(float(splitstrings[:, 4]))
+
+            shear = float(splitstrings[:, 5])
+            moment_val = float(splitstrings[:, 6])
+            ju_val = float(splitstrings[:, 7])
+
+            shearforce.append(shear)
+            shearlevel.append(level)
+            moment.append(moment_val)
+            momentlevel.append(level)
+            ju_graphic.append(ju_val)
+
+        return (
+            EarthPressureResults,
+            level_graphic, e1_graphic, e2_graphic,
+            dw_graphic, enet_graphic,
+            shearforce, shearlevel,
+            moment, momentlevel,
+            ju_graphic
+        )
+
+    # Computes maximum shear and moment values along with their corresponding levels
+    def compute_extreme_forces(shearforce, shearlevel, moment, momentlevel):
+        maxshear = max(shearforce, key=abs)
+        shear_index = shearforce.index(maxshear)
+        maxshearlevel = shearlevel[shear_index]
+
+        maxmom = max(moment, key=abs)
+        moment_index = moment.index(maxmom)
+        maxmomlvl = momentlevel[moment_index]
+
+        return maxshear, maxshearlevel, maxmom, maxmomlvl

@@ -23,6 +23,7 @@
 from SpooksHelperLib.Utils import utils
 from SpooksHelperLib.Generators import generators
 from SpooksHelperLib.SoilProfiles import soilprofiles
+from SpooksHelperLib.SPOOKS import spooksfile
 
 import numpy as np
 import pandas as pd
@@ -120,9 +121,10 @@ def ImportExcel(input_path):
 
     
     data_array = [INFO['A1':'H28'], GeneralInfo['A3':'B7'], Stratification['A4':'K289'], Wall['A3':'B5'], Water['A3':'A5'], Add_pres['A3':'C114'], Analyses['A3':'AA56'], LoadComb['A3':'M42'], SheetPileAddOn['A1':'G30']]
+    ###### This returns an array with all the data post-processing. So docready_array[0] is INFO, docready_array[1] is stratification etc.
     docready_array = utils.data_rows_arr(data_array)
 
-    ###### This returns an array with all the data post processing. So docready_array[0] is INFO, docready_array[1] is stratification etc.
+
     INFO = pd.DataFrame(docready_array[0])
     Stratification = docready_array[1]
     InputFileID = str(INFO.iloc[27,1])
@@ -155,77 +157,6 @@ def LogFile(InputFileDir,AnalysisNo,SPOOKSOut):
                 f.write("%s\n" % item)
     f.close()
 
-
-
-def ExecuteSPOOKS(Analysis,logtxt,tk):
-    
-    Output = GenerateSPOOKSInputFile(Analysis)
-    
-    Analysis = Output.get('Analysis')
-    AnalysisNo = Analysis.get('AnalysisNo')
-    InputFile = Output.get('InputFile')
-    InputFileDir = Output.get('InputFileDir')
-    SPOOKSPlotFile = Output.get('SPOOKSPlotFile')
-    
-    
-    
-    ## Date and time
-    Now = datetime.now() # current date and time
-    DateTime = Now.strftime("%d.%m.%Y, %H:%M:%S")
-    Date = Now.strftime("%d.%m.%Y")
-    
-    args = r'spookswat.exe'+' '+'/CALC:"'+InputFile+'"'
-        
-    process = subprocess.Popen(args, cwd = r'C:\Program Files (x86)\WinSpooks', shell=True, stdin = None, stderr = subprocess.PIPE, stdout = subprocess.PIPE, universal_newlines=True)
-    
-    SPOOKSOut = process.stdout.readlines()
-    
-    logtxt.insert(tk.END, SPOOKSOut)
-    
-    print(SPOOKSOut) ### Printing output if script run as script
-
-    #logtxt.insert(tk.END, out) ### Print "out" to log tab in GUI
-    
-    ReportWarnings = []
-    ReportErrors = []
-    
-    ###### If "STOPPED", "WARNING" or "*ERR*" is contained in SPOOKSWAT output, status changes
-    for i in range(0,len(SPOOKSOut)):
-        p = str(SPOOKSOut[i])
-        if 'STOPPED' in p:
-            #stat.configure(text = 'Calculation failed - check log file')
-            print('Calculation stopped - check log file')
-            ReportErrors.append('Calculation stopped - check log file')
-            #break_calc == 'break'
-        if 'WARNING' in p:
-            #warning.configure(text = out[i])
-            #stat.configure(text = 'Calculation stopped')
-            print('Calculation stopped')
-            #break_calc == 'break'
-            ReportWarnings.append('WinSPOOKS warning: check log file')
-        if '*ERR*' in p:
-            #warning.configure(text = out[i])
-            #stat.configure(text = 'Calculation stopped')
-            #break_calc == 'break'
-            print('Calculation stopped due to error')
-            ReportErrors.append('WinSPOOKS error: check log file')
-        if 'The input contains boundaries below the encastre level.' in p: ## warning in report if generation of reports is checked off:
-            ReportWarnings.append('The input contains boundaries below the encastre level.')
-            
-    LogFile(InputFileDir,AnalysisNo,SPOOKSOut)
-    
-    ExecuteOutput = {'Analysis': Analysis,
-                     'Date': Date,
-                     'DateTime': DateTime,
-                     'SPOOKSOutput': SPOOKSOut,
-                     'Warnings': ReportWarnings,
-                     'Errors': ReportErrors,
-                     'InputFileDir': InputFileDir,
-                     'SPOOKSPlotFile': SPOOKSPlotFile}
-    
-    
-    return ExecuteOutput
-    
 
 
 def GetResults(ExecuteOutput):
