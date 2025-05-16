@@ -35,7 +35,6 @@ import tkinter as tk
 import tkinter.scrolledtext as tkst
 import contextlib
 import PyPDF2
-import os
 import subprocess
 import time
 

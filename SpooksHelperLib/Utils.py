@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import os
 
 from GUI_SPOOKSFunctions_2_0 import InputFileIDGUI, stat
 from SpooksHelperLib.Generators import generators
@@ -45,6 +46,18 @@ class utils:
             
         return InputFileStatus
 
+
+    def TemporaryWorkingDirectory():
+        user = "MLHU"
+        
+        ## output path
+        TemporaryPath = os.path.join(r'C:\Users', user)
+        TemporaryPath = os.path.join(TemporaryPath, r'AppData\Local\Temp\2')
+        
+        if not os.path.exists(TemporaryPath): ## if directory does not exist -> create it
+            os.makedirs(TemporaryPath)
+            
+        return TemporaryPath
 
     ###This function calculates the additional pressures
     def AddPressProfiles(APnum, Add_pres, AdditionalPressures):
@@ -214,3 +227,16 @@ class utils:
                 'SC': Analyses.iloc[Analysis, 26],
                 'SheetPileAddOnInput': generators.GenerateSheetPileAddOnInput(ImportData.get('SheetPileAddOn'))
             }
+    
+    def AddSpaces(item):
+        if len(item) == 4:
+            space = '      ' # 6 spaces
+        if len(item) == 5:
+            space = '     '  # 5 spaces
+        if len(item) == 6:
+            space = '    '   # 4 spaces
+        
+        return space+item
+
+            
+        

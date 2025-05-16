@@ -60,4 +60,42 @@ class soilprofiles():
             ## Append to soil profile dictionary
             SoilProfiles.get(SoilProfile).get(Side).get('Layers').append(SoilLayer)
 
-    
+    def designsoillayer(DesignSoilLayers, State):
+        for Layer in DesignSoilLayers:  # creates lines for soil on front
+            
+            if State.lower() == 'undrained' and Layer.get('KeepDrained') == 'No':
+            
+                S_temp = [format(Layer.get('TopLayer'),'.2f'), 
+                        format(Layer.get('Gamma_d'),'.2f'), 
+                        format(Layer.get('Gamma_m'),'.2f'), 
+                        format(Layer.get('i'),'.2f'), 
+                        '0.00',
+                        format(Layer.get('cu'),'.2f'), 
+                        format(Layer.get('r'),'.2f')]
+            
+            elif State.lower() == 'drained' or Layer.get('KeepDrained') == 'Yes':
+                
+                S_temp = [format(Layer.get('TopLayer'),'.2f'), 
+                        format(Layer.get('Gamma_d'),'.2f'), 
+                        format(Layer.get('Gamma_m'),'.2f'), 
+                        format(Layer.get('i'),'.2f'),
+                        format(Layer.get('phi'),'.2f'), 
+                        format(Layer.get('c'),'.2f'), 
+                        format(Layer.get('r'),'.2f')]
+                
+        
+            SoilFront = ""
+        
+            for item in S_temp: # creates the right amount of space between columns
+                if len(item) == 4:
+                    space = '      ' # 6 spaces
+                if len(item) == 5:
+                    space = '     '  # 5 spaces
+                if len(item) == 6:
+                    space = '    '   # 4 spaces
+                SoilFront += space + item
+            
+            L.append(SoilFront)
+        
+        L.append('>')
+        L.append('<')
