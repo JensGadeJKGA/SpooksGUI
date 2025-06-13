@@ -1,131 +1,27 @@
 from PDFhelper import PDFhelper as ph
+from fpdf import FPDF
+from reportFront import reportFront
 
 class generatePDF:
 
     def PDFGenerator(VerticalEquilibriumOutput, SheetPileAddOnResults, Version):
         
         print('Generating report pages...')
-        PDFdict, GetResultsOutput = ph.generatePDFdict(VerticalEquilibriumOutput)
+        PDFdict, PlotResults, Analysis = ph.generatePDFdict(VerticalEquilibriumOutput)
         
         ### Max soil layer level front
-        ToeLevel,SumTanForce,WallMass,WeightWallTotal = ph.generateToeLevel(VerticalEquilibriumOutput, PDFdict['Analysis'])
+        ToeLevel, SumTanForce, WallMass, WeightWallTotal = ph.generateToeLevel(VerticalEquilibriumOutput, PDFdict['Analysis'], PDFdict['SoilLayersFront'])
+        PlotLevels, e1, e2, Moment, ShearForce, DW, ENet, JU = ph.extractPlotResults(PlotResults)
         
+        ##################### Sheet pile add on ######################
+        Sheetpiledict, Sheetpile, u_rel, control_Rot, u_rel_lvl = ph.extractSheetPileInput(Analysis)
         
-
-        PlotLevels = PlotResults.get('PlotLevels')
-        e1 = PlotResults.get('e1')
-        e2 = PlotResults.get('e2')
-        Moment = PlotResults.get('Moment')
-        ShearForce = PlotResults.get('ShearForce')
-        DW = PlotResults.get('DW')
-        ENet = PlotResults.get('enet')
-        JU = PlotResults.get('JU')
-        
-        
-        
-        ##################### Sheet pile add on #######################
-        
-        SheetPileAddOnInput = Analysis.get('SheetPileAddOnInput')
-        
-
-        
-        UseAddOn = SheetPileAddOnInput.get('UseAddOn')
-        LimitState = SheetPileAddOnInput.get('LimitState')
-        ControlClass = SheetPileAddOnInput.get('ControlClass')
-        Optimize = SheetPileAddOnInput.get('Optimize')
-        MaxUtilization = SheetPileAddOnInput.get('MaxUtilization')
-        fyk = SheetPileAddOnInput.get('fyk')
-        BetaB = SheetPileAddOnInput.get('BetaB')
-        BetaD = SheetPileAddOnInput.get('BetaD')
-        DesignLife = SheetPileAddOnInput.get('DesignLife')
-        tCor = SheetPileAddOnInput.get('tCor')
-        tCorLevel = SheetPileAddOnInput.get('tCorLevel')
-        SoilDeposit = SheetPileAddOnInput.get('SoilDeposit')
-        
-        ### results
-        Sheetpile = SheetPileAddOnResults.get('SheetPileProfile')
-        u_rel = SheetPileAddOnResults.get('RUR')
-        control_Rot = SheetPileAddOnResults.get('RotCap')
-        u_rel_lvl = SheetPileAddOnResults.get('RURLevel')
-
-        
-
-
-        
-            
         # ## Font for cowi logo
         # pdf.add_font('century', '', r"C:\Users\EMBT\OneDrive - COWI\Documents\Python\SPOOKS\CENSCBK.TTF", uni=True)
         
-        class PDF(FPDF):
-            def header(self):
-                self.set_font('Arial', '', 20)
-                self.cell(0, 10, 'COWI', 0, 0, 'L')
-                self.set_font('Courier', '', 9)
-                self.cell(0, 10, Project+', '+Subject+', '+Date, 0, 0, 'R')
-                # Line break
-                self.ln(10)
-        
-            # Page footer
-            def footer(self):
-                # Position at 1.5 cm from bottom
-                self.set_y(-15)
-                self.set_font('Courier', '', 7)
-                self.cell(0, 10, 'COWI WinSpooks Plug-in '+Version, 0, 0, 'L')
-                # Page number
-                self.set_font('Courier', '', 9)
-                self.cell(0, 10, 'Page ' + str(self.page_no()) + ' / {nb}', 0, 0, 'R')
+        pdf, col_width, th = ph.instantiatePDF(PDFdict['Warnings']) 
                 
         
-        # Instantiation of inherited class
-        pdf = PDF()
-        pdf.alias_nb_pages()
-        
-        # Add a page 
-        pdf.add_page('P') 
-        
-        # style and size of font  
-        pdf.set_font("Courier", size = 12) 
-        
-        # Effective page width
-        epw = pdf.w - 2*pdf.l_margin
-        ## Width of columns
-        col_width1 = epw/3
-        col_width2 = epw/2
-        # Text height is the same as current font size
-        th = pdf.font_size
-        
-        #### WARNINGS
-        pdf.set_font("Courier", size = 15) 
-        pdf.cell(200, 10, txt = '0. Warnings', 
-                ln = 6, align = 'L')
-        pdf.ln(2)
-        ## Warning
-        pdf.set_font("Courier", size = 12)
-        if len(Warnings) != 0:
-            
-            for Warning_ in Warnings:
-            
-                if Warning_ == 'The input contains boundaries below the encastre level.':
-                    pdf.cell(200, 10, txt = 'The input contains boundaries below the encastre level.', 
-                            ln = 6, align = 'L')
-                    pdf.cell(200, 10, txt = 'Properties below such boundaries are not used in this program version.', 
-                            ln = 7, align = 'L')
-                    pdf.cell(200, 10, txt = 'The effect should be examined by using a boundary immediately above the', 
-                            ln = 8, align = 'L')
-                    pdf.cell(200, 10, txt = 'encastre level with suitably adjusted parameters.', 
-                            ln = 9, align = 'L')
-                elif Warning_ == 'WinSPOOKS warning: check log file':
-                    pdf.cell(200, 10, txt = 'WinSPOOKS warning: check log file.', 
-                            ln = 6, align = 'L')
-                    
-                elif Warning_ == 'WinSPOOKS error: check log file':
-                    pdf.cell(200, 10, txt = 'WinSPOOKS error: check log file.', 
-                            ln = 6, align = 'L')
-        else:
-            pdf.cell(200, 10, txt = 'No warnings.', 
-                    ln = 6, align = 'L')
-        
-        pdf.ln(2)
         
         #### GENERAL INFORMATION
         # Header
