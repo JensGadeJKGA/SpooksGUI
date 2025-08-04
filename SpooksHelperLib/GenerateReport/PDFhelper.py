@@ -1,3 +1,5 @@
+from fpdf import FPDF
+
 class PDFhelper:
     def generatePDFdict(VerticalEquilibriumOutput):
         GetResultsOutput = VerticalEquilibriumOutput.get('GetResultsOutput')
@@ -12,7 +14,7 @@ class PDFhelper:
             'Checker': Analysis.get('Checker'),
             'Approver': Analysis.get('Approver'),
             'Date': GetResultsOutput.get('Date'),
-            'Warning': GetResultsOutput.get('Warnings'),
+            'Warnings': GetResultsOutput.get('Warnings'),
             'AnalysisNo': Analysis.get('AnalysisNo'),
             'State': Analysis.get('State'),
             'WaterDensity': Analysis.get('WaterDensity'),
@@ -51,9 +53,9 @@ class PDFhelper:
             'MomentAtAnchor': GetResultsOutput.get('Results').get('MomentAtAnchor'),
             'ToeLevel': GetResultsOutput.get('Results').get('ToeLevel'),
         }  
-        return PDFdict, GetResultsOutput
+        return PDFdict, PlotResults, Analysis
     
-    def generateToeLevel(VerticalEquilibriumOutput, Analysis):
+    def generateToeLevel(VerticalEquilibriumOutput, Analysis, SoilLayersFront):
         GetResultsOutput = VerticalEquilibriumOutput.get('GetResultsOutput')
 
         ToeLevel = GetResultsOutput.get('Results').get('ToeLevel')
@@ -70,3 +72,124 @@ class PDFhelper:
         WeightWallTotal = (Analysis.get('WallMass') * 9.82 / 1000) * (zT - ToeLevel)
 
         return ToeLevel,SumTanForce,WallMass,WeightWallTotal
+    
+    def extractPlotResults(PlotResults):
+        return (PlotResults.get('PlotLevels'),
+            PlotResults.get('e1'),
+            PlotResults.get('e2'),
+            PlotResults.get('Moment'),
+            PlotResults.get('ShearForce'),
+            PlotResults.get('DW'),
+            PlotResults.get('enet'),
+            PlotResults.get('JU'),
+        )
+
+    def extractSheetPileInput(Analysis, SheetPileAddOnResults):
+        Sheetpile = SheetPileAddOnResults.get('SheetPileProfile')
+        u_rel = SheetPileAddOnResults.get('RUR')
+        control_Rot = SheetPileAddOnResults.get('RotCap')
+        u_rel_lvl = SheetPileAddOnResults.get('RURLevel')
+
+        return {'UseAddOn': Analysis.get('SheetPileAddOnInput').get('UseAddOn'),
+            'LimitState': Analysis.get('SheetPileAddOnInput').get('LimitState'),
+            'ControlClass': Analysis.get('SheetPileAddOnInput').get('ControlClass'),
+            'Optimize': Analysis.get('SheetPileAddOnInput').get('Optimize'),
+            'MaxUtilization': Analysis.get('SheetPileAddOnInput').get('MaxUtilization'),
+            'fyk': Analysis.get('SheetPileAddOnInput').get('fyk'),
+            'BetaB': Analysis.get('SheetPileAddOnInput').get('BetaB'),
+            'BetaD': Analysis.get('SheetPileAddOnInput').get('BetaD'),
+            'DesignLife': Analysis.get('SheetPileAddOnInput').get('DesignLife'),
+            'tCor': Analysis.get('SheetPileAddOnInput').get('tCor'),
+            'tCorLevel': Analysis.get('SheetPileAddOnInput').get('tCorLevel'),
+            'SoilDeposit': Analysis.get('SheetPileAddOnInput').get('SoilDeposit')
+        },Sheetpile,u_rel,control_Rot,u_rel_lvl
+    
+    def instantiatePDF(PDFdict):
+
+        class PDF(FPDF):
+            def header(self):
+                self.set_font('Arial', '', 20)
+                self.cell(0, 10, 'COWI', 0, 0, 'L')
+                self.set_font('Courier', '', 9)
+                self.cell(0, 10, PDFdict['Project']+', '+PDFdict['Subject']+', '+PDFdict['Date'], 0, 0, 'R')
+                # Line break
+                self.ln(10)
+        
+            # Page footer
+            def footer(self):
+                # Position at 1.5 cm from bottom
+                self.set_y(-15)
+                self.set_font('Courier', '', 7)
+                self.cell(0, 10, 'COWI WinSpooks Plug-in '+PDFdict['Version'], 0, 0, 'L')
+                # Page number
+                self.set_font('Courier', '', 9)
+                self.cell(0, 10, 'Page ' + str(self.page_no()) + ' / {nb}', 0, 0, 'R')
+
+        # Instantiation of inherited class
+        pdf = PDF()
+        pdf.alias_nb_pages()
+        
+        # Add a page 
+        pdf.add_page('P') 
+        
+        # style and size of font  
+        pdf.set_font("Courier", size = 12) 
+        
+        # Effective page width
+        epw = pdf.w - 2*pdf.l_margin
+        ## Width of columns
+        col_width1 = epw/3
+        col_width2 = epw/2
+        # Text height is the same as current font size
+        th = pdf.font_size
+        
+        #### WARNINGS
+        pdf.set_font("Courier", size = 15) 
+        pdf.cell(200, 10, txt = '0. Warnings', 
+                ln = 6, align = 'L')
+        pdf.ln(2)
+        ## Warning
+        pdf.set_font("Courier", size = 12)
+        if len(PDFdict['Warnings']) != 0:
+            
+            for Warning_ in PDFdict['Warnings']:
+            
+                if Warning_ == 'The input contains boundaries below the encastre level.':
+                    pdf.cell(200, 10, txt = 'The input contains boundaries below the encastre level.', 
+                            ln = 6, align = 'L')
+                    pdf.cell(200, 10, txt = 'Properties below such boundaries are not used in this program version.', 
+                            ln = 7, align = 'L')
+                    pdf.cell(200, 10, txt = 'The effect should be examined by using a boundary immediately above the', 
+                            ln = 8, align = 'L')
+                    pdf.cell(200, 10, txt = 'encastre level with suitably adjusted parameters.', 
+                            ln = 9, align = 'L')
+                elif Warning_ == 'WinSPOOKS warning: check log file':
+                    pdf.cell(200, 10, txt = 'WinSPOOKS warning: check log file.', 
+                            ln = 6, align = 'L')
+                    
+                elif Warning_ == 'WinSPOOKS error: check log file':
+                    pdf.cell(200, 10, txt = 'WinSPOOKS error: check log file.', 
+                            ln = 6, align = 'L')
+        else:
+            pdf.cell(200, 10, txt = 'No warnings.', 
+                    ln = 6, align = 'L')
+        
+        pdf.ln(2)
+        return pdf, [col_width1, col_width2], th, epw
+    
+    def fillPDF(identifier, pdfdict, pdf, col_width, th, i=2, text=None):
+        if text:
+            pdf.cell(col_width[0], 2*th, str(text+':'), border=1)
+        else: pdf.cell(col_width[0], 2*th, str(identifier+':'), border=1)
+        pdf.cell(col_width[1], 2*th, str(pdfdict[identifier]), border=1)
+        pdf.ln(i*th)
+
+    def fillPDFext(identifier, pdfdict, pdf, col_width, th, name, i=2, text=None):
+        if text:
+            pdf.cell(col_width[0], 2*th, str(text+':'), border=1)
+        else: pdf.cell(col_width[0], 2*th, str(identifier+':'), border=1)
+        pdf.cell(col_width[1], 2*th, str(pdfdict[identifier]), border=1)
+        pdf.cell(col_width[0], 2*th, str(name), border=1)
+        pdf.ln(i*th)
+        
+        

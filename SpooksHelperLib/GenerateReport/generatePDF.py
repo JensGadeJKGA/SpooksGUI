@@ -19,11 +19,12 @@ class generatePDF:
         # ## Font for cowi logo
         # pdf.add_font('century', '', r"C:\Users\EMBT\OneDrive - COWI\Documents\Python\SPOOKS\CENSCBK.TTF", uni=True)
         
-        pdf, col_width, th = ph.instantiatePDF(PDFdict['Warnings']) 
+        pdf, col_width, th, epw = ph.instantiatePDF(PDFdict['Warnings']) 
                 
         
         
         #### GENERAL INFORMATION
+
         # Header
         pdf.set_font("Courier", size = 15) 
         pdf.cell(200, 10, txt = '1. General information', 
@@ -34,73 +35,46 @@ class generatePDF:
                 ln = 11, align = 'L')
         
         # Date
-        pdf.cell(col_width1, 2*th, str('Date:'), border=1)
-        pdf.cell(col_width2, 2*th, str(Date), border=1)
-        pdf.ln(2*th)
+        ph.fillPDF('Date',PDFdict,pdf,col_width,th)
         # Project
-        pdf.cell(col_width1, 2*th, str('Project:'), border=1)
-        pdf.cell(col_width2, 2*th, str(Project), border=1)
-        pdf.ln(2*th)
-        
+        ph.fillPDF('Project',PDFdict,pdf,col_width,th)        
         # Initials
-        pdf.cell(col_width1, 2*th, str('Initials:'), border=1)
-        pdf.cell(col_width2, 2*th, str(Initials), border=1)
-        pdf.ln(2*th)
+        ph.fillPDF('Initials',PDFdict,pdf,col_width,th)
         # Subject
-        pdf.cell(col_width1, 2*th, str('Subject:'), border=1)
-        pdf.cell(col_width2, 2*th, str(Subject), border=1)
-        pdf.ln(2*th)
+        ph.fillPDF('Subject',PDFdict,pdf,col_width,th)
         # Calc. no.
-        pdf.cell(col_width1, 2*th, str('Calculation no.:'), border=1)
-        pdf.cell(col_width2, 2*th, str(AnalysisNo), border=1)
-        pdf.ln(4*th)
+        ph.fillPDF('AnalysisNo',PDFdict,pdf,col_width,th,4,'Calculation no.')
         ## Check
         pdf.cell(200, 10, txt = "1.2 Check", 
                 ln = 11, align = 'L')
-        pdf.cell(col_width1, 2*th, str('Checker:'), border=1)
-        pdf.cell(col_width2, 2*th, str(Checker), border=1)
-        pdf.ln(2*th)
+        ph.fillPDF('Checker', PDFdict, pdf, col_width, th)
         pdf.cell(col_width1, 2*th, str('Date:'), border=1)
         pdf.cell(col_width2, 2*th, str(''), border=1)
         pdf.ln(4*th)
         ## Approval
         pdf.cell(200, 10, txt = "1.2 Approval", 
                 ln = 11, align = 'L')
-        pdf.cell(col_width1, 2*th, str('Approver:'), border=1)
-        pdf.cell(col_width2, 2*th, str(Approver), border=1)
-        pdf.ln(2*th)
+        ph.fillPDF('Approver',PDFdict,pdf,col_width,th)
         # Header
         pdf.ln(2*th)
         pdf.set_font("Courier", size = 15) 
         pdf.cell(200, 10, txt = '2. Input parameters', 
                 ln = 14, align = 'L')
         ## Width of columns
-        col_width1 = epw/3
-        col_width2 = epw/6
+        col_width[0] = epw/3
+        col_width[1] = epw/6
         # Top wall
         pdf.set_font("Courier", size = 12)
-        pdf.cell(col_width1, 2*th, str('Wall top, zT:'), border=1)
-        pdf.cell(col_width2, 2*th, str(zT), border=1)
-        pdf.cell(col_width1, 2*th, str('m'), border=1)
-        pdf.ln(2*th)
+        ph.fillPDFext('zT',PDFdict,pdf,col_width,th,'m')
 
-        if AnchorLevel != None:
+        if PDFdict['Anchorlevel'] != None:
             # Anchor level
-            pdf.cell(col_width1, 2*th, str('Anchor level, zA:'), border=1)
-            pdf.cell(col_width2, 2*th, str(AnchorLevel), border=1)
-            pdf.cell(col_width1, 2*th, str('m'), border=1)
-            pdf.ln(2*th)
+            ph.fillPDFext('Anchorlevel',PDFdict,pdf,col_width,th,'m',2,'Anchor level, zA')
             # Anchor inclination
-            pdf.cell(col_width1, 2*th, str('Anchor inclination:'), border=1)
-            pdf.cell(col_width2, 2*th, str(AnchorInclination), border=1)
-            pdf.cell(col_width1, 2*th, str('deg.'), border=1)
-            pdf.ln(2*th)
+            ph.fillPDFext('AnchorInclination',PDFdict,pdf,col_width,th,'deg.',2,'Anchor inclination:')
             # Prescribed anchor force
-            if PrescrbAnchorForce != 0.00:
-                pdf.cell(col_width1, 2*th, str('Prescr. anchor force:'), border=1)
-                pdf.cell(col_width2, 2*th, str(PrescrbAnchorForce), border=1)
-                pdf.cell(col_width1, 2*th, str('kN/m'), border=1)
-                pdf.ln(2*th)
+            if PDFdict['PrescrAnchorForce'] != 0.00:
+                ph.fillPDFext('PrescrAnchorForce',PDFdict,pdf,col_width,th,'kN/m.',2,'Prescr. anchor force:')
             else:
                 pdf.cell(col_width1, 2*th, str('Prescr. anchor force:'), border=1)
                 pdf.cell(col_width2, 2*th, str('N/A'), border=1)
