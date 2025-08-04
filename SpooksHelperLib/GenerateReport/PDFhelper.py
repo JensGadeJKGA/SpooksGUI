@@ -55,7 +55,7 @@ class PDFhelper:
         }  
         return PDFdict, PlotResults, Analysis
     
-    def generateToeLevel(VerticalEquilibriumOutput, Analysis, SoilLayersFront):
+    def generateToeLevel(VerticalEquilibriumOutput, Analysis, SoilLayersFront, zT):
         GetResultsOutput = VerticalEquilibriumOutput.get('GetResultsOutput')
 
         ToeLevel = GetResultsOutput.get('Results').get('ToeLevel')
@@ -183,6 +183,7 @@ class PDFhelper:
         else: pdf.cell(col_width[0], 2*th, str(identifier+':'), border=1)
         pdf.cell(col_width[1], 2*th, str(pdfdict[identifier]), border=1)
         pdf.ln(i*th)
+        return pdf
 
     def fillPDFext(identifier, pdfdict, pdf, col_width, th, name, i=2, text=None):
         if text:
@@ -191,5 +192,39 @@ class PDFhelper:
         pdf.cell(col_width[1], 2*th, str(pdfdict[identifier]), border=1)
         pdf.cell(col_width[0], 2*th, str(name), border=1)
         pdf.ln(i*th)
+        return pdf
         
+    def fillResultext(pdf,pdfdictentry,th, col_width,text,name):
+        pdf.cell(col_width[0], 2*th, str(text+':'), border=1)
+        pdf.cell(col_width[1], 2*th, str(format(pdfdictentry,'.1f')), border=1)
+        pdf.cell(col_width[0], 2*th, str(name), border=1)
+        pdf.ln(2*th)
+        return pdf
+    
+    def appendSoillayerData(SoilData, SoilLayers, pdf, col_width, th, sidetxt):
+        pdf.ln(2*th)
+        pdf.cell(200, 10, txt = sidetxt, 
+                ln = 13, align = 'L')
+    
+        for i in range(0,len(SoilLayers)): 
+            SoilData.append([format(float(SoilLayers[i].get('TopLayer')),'.2f'), 
+                            format(float(SoilLayers[i].get('Gamma_d')),'.0f'), 
+                            format(float(SoilLayers[i].get('Gamma_m')),'.0f'), 
+                            format(float(SoilLayers[i].get('cu')),'.0f'), 
+                            format(float(SoilLayers[i].get('c')),'.0f'), 
+                            format(float(SoilLayers[i].get('phi')),'.0f'), 
+                            format(float(SoilLayers[i].get('i')),'.1f'), 
+                            format(float(SoilLayers[i].get('r')),'.2f'),
+                            SoilLayers[i].get('Description'), SoilLayers[i].get('KeepDrained')])
+                            
+        for row in SoilData:
+            for cellno, datum in enumerate(row):
+                if cellno < 8:
+                    # Enter data in column
+                    pdf.cell(col_width[0], 2*th, str(datum), border=1)
         
+                else:
+                    pdf.cell(col_width[1], 2*th, str(datum), border=1)
+        
+            pdf.ln(2*th)
+        return

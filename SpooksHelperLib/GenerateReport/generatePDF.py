@@ -1,10 +1,15 @@
+import os
 from PDFhelper import PDFhelper as ph
 from fpdf import FPDF
 from reportFront import reportFront
 
-class generatePDF:
+import numpy as np
 
-    def PDFGenerator(VerticalEquilibriumOutput, SheetPileAddOnResults, Version):
+class generatePDF:
+    def __init__(self):
+        pass
+
+    def PDFGenerator(self,VerticalEquilibriumOutput, SheetPileAddOnResults, Version):
         
         print('Generating report pages...')
         PDFdict, PlotResults, Analysis = ph.generatePDFdict(VerticalEquilibriumOutput)
@@ -35,26 +40,26 @@ class generatePDF:
                 ln = 11, align = 'L')
         
         # Date
-        ph.fillPDF('Date',PDFdict,pdf,col_width,th)
+        pdf = ph.fillPDF('Date',PDFdict,pdf,col_width,th)
         # Project
-        ph.fillPDF('Project',PDFdict,pdf,col_width,th)        
+        pdf = ph.fillPDF('Project',PDFdict,pdf,col_width,th)        
         # Initials
-        ph.fillPDF('Initials',PDFdict,pdf,col_width,th)
+        pdf = ph.fillPDF('Initials',PDFdict,pdf,col_width,th)
         # Subject
-        ph.fillPDF('Subject',PDFdict,pdf,col_width,th)
+        pdf = ph.fillPDF('Subject',PDFdict,pdf,col_width,th)
         # Calc. no.
-        ph.fillPDF('AnalysisNo',PDFdict,pdf,col_width,th,4,'Calculation no.')
+        pdf = ph.fillPDF('AnalysisNo',PDFdict,pdf,col_width,th,4,'Calculation no.')
         ## Check
         pdf.cell(200, 10, txt = "1.2 Check", 
                 ln = 11, align = 'L')
-        ph.fillPDF('Checker', PDFdict, pdf, col_width, th)
+        pdf = ph.fillPDF('Checker', PDFdict, pdf, col_width, th)
         pdf.cell(col_width1, 2*th, str('Date:'), border=1)
         pdf.cell(col_width2, 2*th, str(''), border=1)
         pdf.ln(4*th)
         ## Approval
         pdf.cell(200, 10, txt = "1.2 Approval", 
                 ln = 11, align = 'L')
-        ph.fillPDF('Approver',PDFdict,pdf,col_width,th)
+        pdf = ph.fillPDF('Approver',PDFdict,pdf,col_width,th)
         # Header
         pdf.ln(2*th)
         pdf.set_font("Courier", size = 15) 
@@ -65,263 +70,68 @@ class generatePDF:
         col_width[1] = epw/6
         # Top wall
         pdf.set_font("Courier", size = 12)
-        ph.fillPDFext('zT',PDFdict,pdf,col_width,th,'m')
+        pdf = ph.fillPDFext('zT',PDFdict,pdf,col_width,th,'m')
 
         if PDFdict['Anchorlevel'] != None:
             # Anchor level
-            ph.fillPDFext('Anchorlevel',PDFdict,pdf,col_width,th,'m',2,'Anchor level, zA')
+            pdf = ph.fillPDFext('Anchorlevel',PDFdict,pdf,col_width,th,'m',2,'Anchor level, zA')
             # Anchor inclination
-            ph.fillPDFext('AnchorInclination',PDFdict,pdf,col_width,th,'deg.',2,'Anchor inclination:')
+            pdf = ph.fillPDFext('AnchorInclination',PDFdict,pdf,col_width,th,'deg.',2,'Anchor inclination:')
             # Prescribed anchor force
             if PDFdict['PrescrAnchorForce'] != 0.00:
-                ph.fillPDFext('PrescrAnchorForce',PDFdict,pdf,col_width,th,'kN/m.',2,'Prescr. anchor force:')
+                pdf = ph.fillPDFext('PrescrAnchorForce',PDFdict,pdf,col_width,th,'kN/m.',2,'Prescr. anchor force:')
             else:
                 pdf.cell(col_width1, 2*th, str('Prescr. anchor force:'), border=1)
                 pdf.cell(col_width2, 2*th, str('N/A'), border=1)
                 pdf.cell(col_width1, 2*th, str('kN/m'), border=1)
                 pdf.ln(2*th)
         # Unit weight of wall
+        
         pdf.cell(col_width1, 2*th, str('Mass of wall:'), border=1)
         pdf.cell(col_width2, 2*th, str(WallMass), border=1)
         pdf.cell(col_width1, 2*th, str('kg/m/m of wall'), border=1)
         pdf.ln(2*th)
         # Density of water
-        pdf.cell(col_width1, 2*th, str('Water density, gam_w:'), border=1)
-        pdf.cell(col_width2, 2*th, str(WaterDensity), border=1)
-        pdf.cell(col_width1, 2*th, str('kN/m3'), border=1)
-        pdf.ln(2*th)
+        pdf = ph.fillPDFext('WaterDensity',PDFdict,pdf,col_width,th,'kN/m3',2,'Water density, gam_w')
         # State
-        pdf.cell(col_width1, 2*th, str('State:'), border=1)
-        pdf.cell(col_width2, 2*th, str(State), border=1)
-        pdf.cell(col_width1, 2*th, str('-'), border=1)
-        pdf.ln(2*th)
+        pdf = ph.fillPDFext('State', PDFdict,pdf, col_width,th,'-')
         # Slope back
-        pdf.cell(col_width1, 2*th, str('Slope back:'), border=1)
-        pdf.cell(col_width2, 2*th, str(SlopeBack), border=1)
-        pdf.cell(col_width1, 2*th, str('deg.'), border=1)
-        pdf.ln(2*th)
+        pdf = ph.fillPDFext('SlopeBack',PDFdict,pdf,col_width,th,'deg.',2,'Slope back')
         # Slope front
-        pdf.cell(col_width1, 2*th, str('Slope front:'), border=1)
-        pdf.cell(col_width2, 2*th, str(SlopeFront), border=1)
-        pdf.cell(col_width1, 2*th, str('deg.'), border=1)
-        pdf.ln(2*th)
+        pdf = ph.fillPDFext('SlopeFront',PDFdict,pdf,col_width,th,'deg.',2,'Slope Front')
         # Soil profile
-        pdf.cell(col_width1, 2*th, str('Soil profile:'), border=1)
-        pdf.cell(col_width2, 2*th, str(SoilProfile), border=1)
-        pdf.cell(col_width1, 2*th, str('-'), border=1)
-        pdf.ln(2*th)
-        pdf.ln(2*th)
-        pdf.cell(200, 10, txt = "2.1 Characteristic soil parameters back", 
-                ln = 13, align = 'L')
+        pdf = ph.fillPDFext('SoilProfile',PDFdict,pdf,col_width,th,'-',2,'Soil profile')
+ 
+       
         
         ## Width of columns
-        col_width1 = epw/12
-        col_width2 = epw/6
-        
-        
+        col_width = [epw/12,epw/6]
+    
         SoilData = [["z_top", "g_d", "g_m", "cu","c'","phi'","i","r","Description","Keep drained"],["m", "kN/m3", "kN/m3", "kN/m2","kN/m2","deg.","-","-","-","-"]]
 
-        for i in range(0,len(SoilLayersBack)): 
-            SoilData.append([format(float(SoilLayersBack[i].get('TopLayer')),'.2f'), 
-                            format(float(SoilLayersBack[i].get('Gamma_d')),'.0f'), 
-                            format(float(SoilLayersBack[i].get('Gamma_m')),'.0f'), 
-                            format(float(SoilLayersBack[i].get('cu')),'.0f'), 
-                            format(float(SoilLayersBack[i].get('c')),'.0f'), 
-                            format(float(SoilLayersBack[i].get('phi')),'.0f'), 
-                            format(float(SoilLayersBack[i].get('i')),'.1f'), 
-                            format(float(SoilLayersBack[i].get('r')),'.2f'),
-                            SoilLayersBack[i].get('Description'), SoilLayersBack[i].get('KeepDrained')])
-                            
-        for row in SoilData:
-            for cellno, datum in enumerate(row):
-                if cellno < 8:
-                    # Enter data in column
-                    pdf.cell(col_width1, 2*th, str(datum), border=1)
-        
-                else:
-                    pdf.cell(col_width2, 2*th, str(datum), border=1)
-        
-            pdf.ln(2*th)
-        
-        pdf.ln(2*th)
-        pdf.cell(200, 10, txt = "2.2 Characteristic soil parameters front", 
-                ln = 13, align = 'L')
-        
-        SoilData = [["z_top", "g_d", "g_m", "cu","c'","phi'","i","r","Description","Keep drained"],["m", "kN/m3", "kN/m3", "kN/m2","kN/m2","deg.","-","-","-","-"]]
+        #soil layers back
+        pdf = ph.appendSoillayerData(SoilData,PDFdict['SoilLayersBack'],pdf,col_width,th,"2.1 Characteristic soil parameters back")
 
-        for i in range(0,len(SoilLayersFront)): 
-            SoilData.append([format(float(SoilLayersFront[i].get('TopLayer')),'.2f'), 
-                            format(float(SoilLayersFront[i].get('Gamma_d')),'.0f'), 
-                            format(float(SoilLayersFront[i].get('Gamma_m')),'.0f'), 
-                            format(float(SoilLayersFront[i].get('cu')),'.0f'), 
-                            format(float(SoilLayersFront[i].get('c')),'.0f'), 
-                            format(float(SoilLayersFront[i].get('phi')),'.0f'), 
-                            format(float(SoilLayersFront[i].get('i')),'.1f'), 
-                            format(float(SoilLayersFront[i].get('r')),'.2f'),
-                            SoilLayersFront[i].get('Description'), SoilLayersFront[i].get('KeepDrained')])
-                            
-        
-        for row in SoilData:
-            for cellno, datum in enumerate(row):
-                if cellno < 8:
-                    # Enter data in colums
-                    pdf.cell(col_width1, 2*th, str(datum), border=1)
-                else:
-                    pdf.cell(col_width2, 2*th, str(datum), border=1)
-        
-            pdf.ln(2*th)
-        
+        #front
+        pdf = ph.appendSoillayerData(SoilData,PDFdict['SoilLayersFront'],pdf,col_width,th,"2.2 Characteristic soil parameters front")
+
         ### WATER LEVELS
-        col_width = epw/6
-        pdf.ln(2*th)
-        pdf.cell(200, 10, txt = "2.3 Water levels", 
-                ln = 1, align = 'L')
-        pdf.cell(col_width, 2*th, str('w_b'), border=1)
-        pdf.cell(col_width, 2*th, str('w_f'), border=1)
-        pdf.ln(2*th)
-        pdf.cell(col_width, 2*th, str('[m]'), border=1)
-        pdf.cell(col_width, 2*th, str('[m]'), border=1)
-        pdf.ln(2*th)
-        pdf.cell(col_width, 2*th, str(WaterLevelBack), border=1)
-        pdf.cell(col_width, 2*th, str(WaterLevelFront), border=1)
-        pdf.ln(2*th)
+        pdf = self.waterlevel(epw, pdf, PDFdict,th)
         
-        #### ADDITIONAL PRESSURE
-        pdf.ln(2*th)
-        if AddPressureProfile in ['AP1','AP2','AP3','AP4','AP5','AP6','AP7','AP8','AP9','AP10']:
-            pdf.cell(200, 10, txt = "2.4 Additional pressure profile:"+' '+AddPressureProfile, 
-                    ln = 4, align = 'L')
-            
-            zAP = ['z [m]']
-            for elem in AddPress_z:
-                zAP.append(elem)
-            eAP = ['ez_k [kN/m2]']
-            for elem in AddPress_ez:
-                eAP.append(round(elem,1))
-                
-            eAPd = ['ez_d [kN/m2]']
-            for elem in AddPress_ez_Design:
-                eAPd.append(round(elem,1))
-            
-            AP = [zAP,eAP, eAPd]
-            
-            ## Width of columns
-            col_width1 = epw/12
-            col_width2 = epw/6
-            
-                
-            for row in AP:
-                for cellno, datum in enumerate(row):
-                    if cellno > 0:
-                        # Enter data in colums
-                        pdf.cell(col_width1, 2*th, str(datum), border=1)
-                    else:
-                        pdf.cell(col_width2, 2*th, str(datum), border=1)
-            
-                pdf.ln(2*th)
-        else:
-            pdf.cell(200, 10, txt = "2.4 Additional pressure profile:"+' '+'no additional pressure', 
-                    ln = 4, align = 'L')
+        ### ADDITIONAL PRESSURE
+        pdf = self.addPressure(pdf,PDFdict,epw,th)
         
-        #### LOADS
-        col_width = epw/6
-        pdf.ln(2*th)
-        pdf.cell(200, 10, txt = "2.5 Loads", 
-                ln = 3, align = 'L')
-        pdf.cell(col_width, 2*th, str('zR'), border=1)
-        pdf.cell(col_width, 2*th, str('q_bk'), border=1)
-        pdf.cell(col_width, 2*th, str('q_fk'), border=1)
-        pdf.cell(col_width*2, 2*th, str('Axial wall load (design)'), border=1)
-        pdf.ln(2*th)
-        pdf.cell(col_width, 2*th, str('m'), border=1)
-        pdf.cell(col_width, 2*th, str('kN/m2'), border=1)
-        pdf.cell(col_width, 2*th, str('kN/m2'), border=1)
-        pdf.cell(col_width*2, 2*th, str('kN/m'), border=1)
-        pdf.ln(2*th)
-        pdf.cell(col_width, 2*th, str(zR), border=1)
-        pdf.cell(col_width, 2*th, str(LoadBack), border=1)
-        pdf.cell(col_width, 2*th, str(LoadFront), border=1)
-        pdf.cell(col_width*2, 2*th, str(AxialWallLoad), border=1)
-        pdf.ln(2*th)
+        ### LOADS
+        pdf = self.loads(epw,pdf,th,PDFdict)
         
-        #### SAFETY
-        # partial safety factors
-        col_width1 = epw*3/12
-        col_width2 = epw/12
-        pdf.ln(2*th)
-        pdf.cell(200, 10, txt = "2.6 Safety", 
-                ln = 4, align = 'L')
-        pdf.cell(col_width1, 2*th, str('Alpha'), border=1)
-        pdf.cell(col_width2, 2*th, str(Alpha), border=1)
-        pdf.ln(2*th)
-        pdf.cell(col_width1, 2*th, str('Consequence class:'), border=1)
-        pdf.cell(col_width2, 2*th, str(ConsequenceClass), border=1)
-        pdf.ln(2*th)
-        pdf.set_font("Courier", size = 11) 
-        psf_header = ['f_gamf','f_qf','f_cf','f_cuf','f_phif','f_wat','f_AP','f_gamb','f_qb','f_cb','f_cub','f_phib']
-        for psf in psf_header:
-            pdf.cell(col_width2, 2*th, str(psf), border=1)
-        pdf.ln(2*th)
-        pdf.set_font("Courier", size = 12) 
-        psfs = [PartialSafetyFactors.get('f_gamf'),
-                PartialSafetyFactors.get('f_qf'),
-                PartialSafetyFactors.get('f_cf'),
-                PartialSafetyFactors.get('f_cuf'),
-                PartialSafetyFactors.get('f_phif'),
-                PartialSafetyFactors.get('f_wat'),
-                PartialSafetyFactors.get('f_AP'),
-                PartialSafetyFactors.get('f_gamb'),
-                PartialSafetyFactors.get('f_qb'),
-                PartialSafetyFactors.get('f_cb'),
-                PartialSafetyFactors.get('f_cub'),
-                PartialSafetyFactors.get('f_phib')]
-        for psf in psfs:
-            pdf.cell(col_width2, 2*th, str(np.round(psf,2)), border=1)
-        pdf.ln(2*th)
+        ### SAFETY
+        pdf = self.partialSafetyFactors(epw,pdf,PDFdict,th)
         
         ### FAILURE MODE
-        pdf.ln(2*th)
-        pdf.cell(200, 10, txt = "2.7 Failure mode", 
-                ln = 5, align = 'L')
-        if AnchorLevel != None:
-            pdf.cell(col_width2*3, 2*th, 'Anchored wall', border=1)
-        else:
-            pdf.cell(col_width2*3, 2*th, 'Free wall', border=1)
-        pdf.ln(2*th)
-        fail_coeff_header = ['iA', 'iB', 'iC']
-        fail_coeff = [iA, iB, iC]
-        for fail in fail_coeff_header:
-            pdf.cell(col_width2, 2*th, str(fail), border=1)
-        pdf.ln(2*th)
-        
-        for fail in fail_coeff:
-            pdf.cell(col_width2, 2*th, str(fail), border=1)
-        pdf.ln(2*th)
+        pdf = self.failureMode(pdf,epw,PDFdict,th,)
         
         ### KING POST WALL
-        pdf.ln(2*th)
-        pdf.cell(200, 10, txt = "2.8 King post wall", 
-                ln = 6, align = 'L')
-        if zB != None and WD != None and CC != None:
-            kingpost_header = ['zB', 'WD', 'CC']
-            kingpost_unit = ['m','m','m']
-            kingpost = [zB, WD, CC]
-            for kp in kingpost_header:
-                pdf.cell(col_width2, 2*th, str(kp), border=1)
-            pdf.ln(2*th)
-            
-            for kp in kingpost_unit:
-                pdf.cell(col_width2, 2*th, str(kp), border=1)
-            pdf.ln(2*th)
-            
-            for kp in kingpost:
-                pdf.cell(col_width2, 2*th, str(kp), border=1)
-        else:
-            pdf.cell(200, 10, txt = "Not king post wall.", 
-                ln = 6, align = 'L')
-        pdf.ln(2*th)
-        
-        pdf.add_page('P')
+        pdf = self.kingPostWall(pdf,PDFdict,epw,th)
         
         #### Results
         # Header
@@ -538,3 +348,206 @@ class generatePDF:
         
         
         return TemporaryPath
+
+    def waterlevel(self, epw, pdf, PDFdict,th):
+        col_width = epw/6
+        pdf.ln(2*th)
+        pdf.cell(200, 10, txt = "2.3 Water levels", 
+                ln = 1, align = 'L')
+        pdf.cell(col_width, 2*th, str('w_b'), border=1)
+        pdf.cell(col_width, 2*th, str('w_f'), border=1)
+        pdf.ln(2*th)
+        pdf.cell(col_width, 2*th, str('[m]'), border=1)
+        pdf.cell(col_width, 2*th, str('[m]'), border=1)
+        pdf.ln(2*th)
+        pdf.cell(col_width, 2*th, str(PDFdict['WaterLevelBack']), border=1)
+        pdf.cell(col_width, 2*th, str(PDFdict['WaterLevelFront']), border=1)
+        pdf.ln(2*th)
+
+        return pdf
+
+    def addPressure(self, pdf, PDFdict, epw, th):
+        pdf.ln(2*th)
+        if PDFdict['AddPressureProfile'] in ['AP1','AP2','AP3','AP4','AP5','AP6','AP7','AP8','AP9','AP10']:
+            pdf.cell(200, 10, txt = "2.4 Additional pressure profile:"+' '+ PDFdict['AddPressureProfile'], 
+                    ln = 4, align = 'L')
+            
+            zAP = ['z [m]']
+            for elem in PDFdict['AddPress_z']:
+                zAP.append(elem)
+            eAP = ['ez_k [kN/m2]']
+            for elem in PDFdict['AddPress_ez']:
+                eAP.append(round(elem,1))
+                
+            eAPd = ['ez_d [kN/m2]']
+            for elem in PDFdict['AddPress_ez_Design']:
+                eAPd.append(round(elem,1))
+            
+            AP = [zAP,eAP, eAPd]
+                
+            for row in AP:
+                for cellno, datum in enumerate(row):
+                    if cellno > 0:
+                        # Enter data in colums
+                        pdf.cell(epw/12, 2*th, str(datum), border=1)
+                    else:
+                        pdf.cell(epw/6, 2*th, str(datum), border=1)
+            
+                pdf.ln(2*th)
+        else:
+            pdf.cell(200, 10, txt = "2.4 Additional pressure profile:"+' '+'no additional pressure', 
+                    ln = 4, align = 'L')
+        return pdf
+        
+    def loads(self,epw,pdf,th,PDFdict):
+        col_width = epw/6
+        pdf.ln(2*th)
+        pdf.cell(200, 10, txt = "2.5 Loads", 
+                ln = 3, align = 'L')
+        pdf.cell(col_width, 2*th, str('zR'), border=1)
+        pdf.cell(col_width, 2*th, str('q_bk'), border=1)
+        pdf.cell(col_width, 2*th, str('q_fk'), border=1)
+        pdf.cell(col_width*2, 2*th, str('Axial wall load (design)'), border=1)
+        pdf.ln(2*th)
+        pdf.cell(col_width, 2*th, str('m'), border=1)
+        pdf.cell(col_width, 2*th, str('kN/m2'), border=1)
+        pdf.cell(col_width, 2*th, str('kN/m2'), border=1)
+        pdf.cell(col_width*2, 2*th, str('kN/m'), border=1)
+        pdf.ln(2*th)
+        pdf.cell(col_width, 2*th, str(PDFdict['zR']), border=1)
+        pdf.cell(col_width, 2*th, str(PDFdict['LoadBack']), border=1)
+        pdf.cell(col_width, 2*th, str(PDFdict['LoadFront']), border=1)
+        pdf.cell(col_width*2, 2*th, str(PDFdict['AxialWallLoad']), border=1)
+        pdf.ln(2*th)
+        return pdf
+
+    def partialSafetyFactors(self,epw,pdf,PDFdict,th):
+        PartialSafetyFactors = PDFdict['PartialSafetyFactors']
+        col_width1 = epw*3/12
+        col_width2 = epw/12
+        pdf.ln(2*th)
+        pdf.cell(200, 10, txt = "2.6 Safety", 
+                ln = 4, align = 'L')
+        pdf.cell(col_width1, 2*th, str('Alpha'), border=1)
+        pdf.cell(col_width2, 2*th, str(PDFdict['Alpha']), border=1)
+        pdf.ln(2*th)
+        pdf.cell(col_width1, 2*th, str('Consequence class:'), border=1)
+        pdf.cell(col_width2, 2*th, str(PDFdict['ConsequenceClass']), border=1)
+        pdf.ln(2*th)
+        pdf.set_font("Courier", size = 11) 
+        psf_header = ['f_gamf','f_qf','f_cf','f_cuf','f_phif','f_wat','f_AP','f_gamb','f_qb','f_cb','f_cub','f_phib']
+        for psf in psf_header:
+            pdf.cell(col_width2, 2*th, str(psf), border=1)
+        pdf.ln(2*th)
+        pdf.set_font("Courier", size = 12) 
+        psfs = [PartialSafetyFactors.get('f_gamf'),
+                PartialSafetyFactors.get('f_qf'),
+                PartialSafetyFactors.get('f_cf'),
+                PartialSafetyFactors.get('f_cuf'),
+                PartialSafetyFactors.get('f_phif'),
+                PartialSafetyFactors.get('f_wat'),
+                PartialSafetyFactors.get('f_AP'),
+                PartialSafetyFactors.get('f_gamb'),
+                PartialSafetyFactors.get('f_qb'),
+                PartialSafetyFactors.get('f_cb'),
+                PartialSafetyFactors.get('f_cub'),
+                PartialSafetyFactors.get('f_phib')]
+        for psf in psfs:
+            pdf.cell(col_width2, 2*th, str(np.round(psf,2)), border=1)
+        pdf.ln(2*th)
+        return pdf
+    
+    def failureMode(self,pdf,epw,PDFdict,th,):
+        col_width = epw/6
+        pdf.ln(2*th)
+        pdf.cell(200, 10, txt = "2.7 Failure mode", 
+                ln = 5, align = 'L')
+        if PDFdict['AnchorLevel'] != None:
+            pdf.cell(col_width*3, 2*th, 'Anchored wall', border=1)
+        else:
+            pdf.cell(col_width*3, 2*th, 'Free wall', border=1)
+        pdf.ln(2*th)
+        fail_coeff_header = ['iA', 'iB', 'iC']
+        fail_coeff = [PDFdict['iA'], PDFdict['iB'], PDFdict['iC']]
+        for fail in fail_coeff_header:
+            pdf.cell(col_width, 2*th, str(fail), border=1)
+        pdf.ln(2*th)
+        
+        for fail in fail_coeff:
+            pdf.cell(col_width, 2*th, str(fail), border=1)
+        pdf.ln(2*th)
+        return pdf
+    
+    def kingPostWall(self,pdf,PDFdict,epw,th):
+        col_width = epw/6
+        pdf.ln(2*th)
+        pdf.cell(200, 10, txt = "2.8 King post wall", 
+                ln = 6, align = 'L')
+        if PDFdict['zB'] != None and PDFdict['WD'] != None and PDFdict['CC'] != None:
+            kingpost_header = ['zB', 'WD', 'CC']
+            kingpost_unit = ['m','m','m']
+            kingpost = [PDFdict['zB'], PDFdict['WD'], PDFdict['CC']]
+            for kp in kingpost_header:
+                pdf.cell(col_width, 2*th, str(kp), border=1)
+            pdf.ln(2*th)
+            
+            for kp in kingpost_unit:
+                pdf.cell(col_width, 2*th, str(kp), border=1)
+            pdf.ln(2*th)
+            
+            for kp in kingpost:
+                pdf.cell(col_width, 2*th, str(kp), border=1)
+        else:
+            pdf.cell(200, 10, txt = "Not king post wall.", 
+                ln = 6, align = 'L')
+        pdf.ln(2*th)
+        
+        pdf.add_page('P')
+
+        return pdf
+
+    def results(self,pdf,th,epw,PDFdict):
+        
+        #### Results
+        # Header
+        pdf.set_font("Courier", size = 15) 
+        pdf.cell(200, 10, txt = '3. Results', 
+                ln = 6, align = 'L')
+        
+        pdf.ln(8)
+        
+        pdf.set_font("Courier", size = 12)
+        pdf.cell(200, 10, txt = "3.1 Summary", 
+                ln = 6, align = 'L')
+        col_width = [epw*6/12,epw*2/12]
+        AnchorAxial = PDFdict['AnchorForce']/np.cos(np.radians(PDFdict['AnchorInclination']))
+
+        # Max. moment
+        ph.fillResultext(pdf,abs(PDFdict['MaxMoment']),th,col_width,'Max. |moment|','kNm/m')
+       
+        # Max. shear force
+        ph.fillResultext(pdf,abs(PDFdict['MaxShearForce']),th,col_width,'Max. |shear force|','kN/m')
+
+        # Toe level
+        ph.fillResultext(pdf,PDFdict['ToeLevel'],th,col_width,'Toe level','m')
+
+        if PDFdict['AnchorLevel'] != None:
+            # Anchor force
+            ph.fillResultext(pdf,PDFdict['AnchorForce'],th,col_width,'Anchor force, Ad', 'kN/m')
+            # Axial anchor force
+            ph.fillResultext(pdf,,th,col_width,'Axial anchor force', 'kN/m')
+            # Moment at anchor
+            ph.fillResultext(pdf,abs(PDFdict['MomentAtAnchor']),th,col_width,'|Moment| at anchor level','kNm/m')
+        # Tangential earth pressure resultant
+        ph.fillResultext(pdf,PDFdict['SUmTanForce'],th,col_width,'Sum of tangential earth pressure*','kN/m')
+        # Sum of vertical forces
+        pdf.cell(col_width[0], 2*th, str('Sum of vertical forces*:'), border=1)
+        if PDFdict['AnchorLevel'] != None:
+            pdf.cell(col_width, 2*th, str(format(SumTanForce-AnchorAxial*np.sin(np.radians(float(AnchorInclination)))-WeightWallTotal,'.1f')), border=1)
+        else:
+            pdf.cell(col_width2, 2*th, str(format(SumTanForce-WeightWallTotal,'.1f')), border=1)
+        pdf.cell(col_width2, 2*th, str('kN/m'), border=1)
+        pdf.ln(2*th)
+        # Note
+        pdf.cell(epw*10/12, 2*th, str('*Tangential pressure and vertical forces are positive upwards.'), border=1)
+        pdf.ln(2*th)
