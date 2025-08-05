@@ -36,6 +36,7 @@ import subprocess
 import time
 
 from datetime import datetime
+from pathlib import Path
 from tkinter import ttk
 from tkinter import filedialog
 
@@ -46,7 +47,7 @@ Version = '2.1'
 
 ################ Input file ID ############
 
-InputFileIDGUI = 'A3'
+
 
 
 ############### IMPORT SHEET PILE WALL PLUG IN ###################
@@ -73,7 +74,8 @@ def OpenSpooks():
     
     if winspooks == []:
 
-        subprocess.Popen(['C:\Program Files (x86)\WinSpooks\WinSpooks.exe'])
+        spooks_path = Path("C:/Program Files (x86)/WinSpooks/WinSpooks.exe")
+        subprocess.Popen([str(spooks_path)])
         time.sleep(0.5)
     
     res = None  ## Deleting list

@@ -3,13 +3,18 @@ import numpy as np
 import os
 import io
 from openpyxl import load_workbook
+from tkinter import ttk
+import tkinter as tk
 
-from GUI_SPOOKSFunctions_2_0 import InputFileIDGUI, stat
-from SpooksHelperLib.Generators import generators
 
 ###In this file you will find miscellaneous utility functions.
 
 class utils:
+    def __init__(self):
+        self.InputFileIDGUI = 'A3'
+        self.stat = ttk.Label(ttk.Frame(ttk.Notebook(tk.Tk())), text = " No input file",font = ("Calibri",11))
+        
+
     ####This function generalises the data row creation. The next function does the same thing, but for multiple cells. It takes an array with a set of ranges, and for those ranges it readies the data rows.
     def data_rows(cellrange):
         data_rows = []
@@ -35,16 +40,16 @@ class utils:
         
         return return_array
 
-    def InputFileIDChecker(InputFileID):        
+    def InputFileIDChecker(self,InputFileID):        
         InputFileStatus = None
         
-        if InputFileID == InputFileIDGUI:
+        if InputFileID == self.InputFileIDGUI:
             
             InputFileStatus = 'OK'
             
         else:
             
-            stat.configure(text = 'Input file version does not match GUI version')
+            self.stat.configure(text = 'Input file version does not match GUI version')
             
         return InputFileStatus
 
@@ -179,12 +184,13 @@ class utils:
                             'CC3': {}}
                 
         ### Find CC2 partial safety factors
-        LoadCombinations.get('CC2') = utils.PartialSafetyFactors(LoadComb, LoadCombinations, 'CC2')
+        LoadCombinations['CC2'] = utils.PartialSafetyFactors(LoadComb, LoadCombinations, 'CC2')
             
         ### Find CC3 partial safety factors
-        LoadCombinations.get('CC3') = utils.PartialSafetyFactors(LoadComb, LoadCombinations, 'CC3')
+        LoadCombinations['CC3'] = utils.PartialSafetyFactors(LoadComb, LoadCombinations, 'CC3')
 
-    def make_analysis_dict(Analyses, Analysis, ImportData, anchor_level, anchor_inclination, prescribed_anchor_force, vararr, geninfoarr):
+    def make_analysis_dict(self,Analyses, Analysis, ImportData, anchor_level, anchor_inclination, prescribed_anchor_force, vararr, geninfoarr):
+        from SpooksHelperLib.Generators import generators
         return {
                 'AnalysisNo': geninfoarr[0],
                 'ParentAnalysis': geninfoarr[1],

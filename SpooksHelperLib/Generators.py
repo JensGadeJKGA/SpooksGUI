@@ -1,6 +1,7 @@
-from SoilProfiles import soilprofiles
-from Analysis import analysisclass
-from Utils import utils
+from SpooksHelperLib.SoilProfiles import soilprofiles
+from SpooksHelperLib.Analysis import analysisclass
+from SpooksHelperLib.Utils import utils
+import numpy as np
         
 class generators():
     def GenerateAddPressProfiles(Add_pres):
@@ -84,16 +85,7 @@ class generators():
         
         return SoilProfiles
     
-    def GeneratePartialCoefficientDictionary(LoadComb):
-        LoadCombinations = {'CC2': {},
-                            'CC3': {}}
-                
-        ### Find CC2 partial safety factors
-        LoadCombinations.get('CC2') = utils.PartialSafetyFactors(LoadComb, LoadCombinations, 'CC2')
-            
-        ### Find CC3 partial safety factors
-        LoadCombinations.get('CC3') = utils.PartialSafetyFactors(LoadComb, LoadCombinations, 'CC3')
-    
+   
     def GenerateAnalyses(input_path):
 
         ## Importing Excel file

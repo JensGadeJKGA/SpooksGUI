@@ -1,8 +1,6 @@
 import os
-from PDFhelper import PDFhelper as ph
-from fpdf import FPDF
-from reportFront import reportFront
-from Utils import utils
+from SpooksHelperLib.GenerateReport.PDFhelper import PDFhelper as ph
+from SpooksHelperLib.Utils import utils
 
 import numpy as np
 

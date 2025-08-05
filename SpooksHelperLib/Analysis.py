@@ -3,9 +3,12 @@ import pandas as pd
 
 from SpooksHelperLib.SoilProfiles import soilprofiles
 from SpooksHelperLib.Utils import utils
-from SpooksHelperLib.Generators import generators
+
 
 class analysisclass():
+    def __init__(self):
+         pass
+    
     def AnalysesRange(Analyses):
         null = []
         # This loop aims for the first cell in which the user hasn't entered data in the following order (0: Subject text, 1: Soil profile, 2: Drained or undrained, 3: water front level, 4: water back level, 5: load comb, 6: consequence class, 7: alpha value, 8: front load value, 9: back load value, 10: zR value, 11 is missing, 12: iA value, 13: also iA value, 14: iC value)
@@ -78,10 +81,9 @@ class analysisclass():
                         
 
 
-    def AddDesignParameters(GeneratedAnalyses,LoadComb):
-        from SpooksHelperLib.Analysis import Analysisclass
+    def AddDesignParameters(self,GeneratedAnalyses,LoadComb):
         
-        LoadCombinations = generators.GeneratePartialCoefficientDictionary(LoadComb)
+        LoadCombinations = utils.GeneratePartialCoefficientDictionary(LoadComb)
         
         
         for Analysis in GeneratedAnalyses:
@@ -89,11 +91,11 @@ class analysisclass():
             
             #Soils
             ## Generate design soil layers (back)
-            Analysis['DesignSoilLayersBack'] = Analysisclass.SoilLayerAnalysis(Analysis.get('SoilLayersBack'), PartialSafetyFactors, Analysis, 'DesignSoilLayersBack')
+            Analysis['DesignSoilLayersBack'] = self.SoilLayerAnalysis(Analysis.get('SoilLayersBack'), PartialSafetyFactors, Analysis, 'DesignSoilLayersBack')
             
             
             ## Generate design soil layers (front)
-            Analysis['DesignSoilLayersFront'] = Analysisclass.SoilLayerAnalysis(Analysis.get('SoilLayersFront'), PartialSafetyFactors, Analysis, 'DesignSoilLayersFront')
+            Analysis['DesignSoilLayersFront'] = self.SoilLayerAnalysis(Analysis.get('SoilLayersFront'), PartialSafetyFactors, Analysis, 'DesignSoilLayersFront')
             
             #Additional pressure 
             DesignAddPress_ez = []
@@ -111,6 +113,8 @@ class analysisclass():
     
     def SoilLayerAnalysis(SoilLayers, PartialSafetyFactors, Analysis, Analysisspot):
         DesignSoilLayers = None
+        Alpha = float(Analysis.get('Alpha'))
+        
         for SoilLayer in SoilLayers:
                 
             TopLayer = float(SoilLayer.get('TopLayer'))

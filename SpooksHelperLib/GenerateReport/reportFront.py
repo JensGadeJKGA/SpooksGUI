@@ -1,9 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.interpolate import interp1d
 import os
 
-from reportFrontHelpers import reportFrontHelpers as rfh
+from SpooksHelperLib.GenerateReport.reportFrontHelpers import reportFrontHelpers as rfh
 
 class reportFront:
     def ReportFront(self, VerticalEquilibriumOutput, OutputDirList, Version):

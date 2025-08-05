@@ -5,11 +5,11 @@ import contextlib
 import PyPDF2
 from shutil import copyfile
 
-from Utils import utils
-from generatePDF import generatePDF
-from reportFront import reportFront
-from Vequilibrium import verticalEquilibrium
-from Steel_Sheet_Pile_Wall import steel_sheet_pile_implementer
+from SpooksHelperLib.Utils import utils
+from SpooksHelperLib.GenerateReport.generatePDF import generatePDF
+from SpooksHelperLib.GenerateReport.reportFront import reportFront
+from SpooksHelperLib.Vequilibrium import verticalEquilibrium
+from SpooksHelperLib.Steel_Sheet_Pile_Wall import steel_sheet_pile_implementer
 
 
 class generateReport:

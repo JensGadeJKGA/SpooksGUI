@@ -1,9 +1,9 @@
 import numpy as np
 import os
 
-from exportHelper import exportHelper as eh
-from Steel_Sheet_Pile_Wall import steel_sheet_pile_implementer
-from Vequilibrium import verticalEquilibrium
+from SpooksHelperLib.Export.exportHelper import exportHelper as eh
+from SpooksHelperLib.Steel_Sheet_Pile_Wall import steel_sheet_pile_implementer
+from SpooksHelperLib.Vequilibrium import verticalEquilibrium
 
 class export:
     def __init__(self):
