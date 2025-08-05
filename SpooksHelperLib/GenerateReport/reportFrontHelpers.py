@@ -3,6 +3,9 @@ from scipy.interpolate import interp1d
 import numpy as np
 
 class reportFrontHelpers:
+    def __init__(self):
+        pass
+    
     def generateReportDict(VerticalEquilibriumOutput, OutputDirList):
         GetResultsOutput = VerticalEquilibriumOutput.get('GetResultsOutput')
 
@@ -125,7 +128,7 @@ class reportFrontHelpers:
         return [water_level - adj, water_level - adj]
     
 #TEXT AND ANNOTATION
-    def format_soil_layer_text(layer, state):
+    def format_soil_layer_text(self,layer, state):
         desc = layer.get('Description')
         if state.lower() == 'drained' or layer.get('KeepDrained') == 'Yes':
             txt = r"$\rm \gamma_d/\gamma_m=%.0f/%.0f$ $\rm kN/m^3$, $\phi_k'=%.0f^\circ$, $c_k'=%.0f$ kPa, $r=%.1f$, $i=%.1f$" % (
@@ -146,7 +149,7 @@ class reportFrontHelpers:
         )
 
 #SOIL LAYER PLOT
-    def plot_soil_layers(ax, layers, grn_extent, toe_level, state, side='back'):
+    def plot_soil_layers(self, ax, layers, grn_extent, toe_level, state, side='back'):
         for i, layer in enumerate(layers):
             top = float(layer['TopLayer'])
             if top <= toe_level:
@@ -156,7 +159,7 @@ class reportFrontHelpers:
                 strat = [top, top]
                 ax.plot(grn_extent, strat, alpha=0.8, color='black', linewidth=1.0)
 
-            text = rfh.format_soil_layer_text(layer, state)
+            text = self.format_soil_layer_text(layer, state)
             vert_pos = (
                 (top + layers[i+1]['TopLayer']) / 2 if i < len(layers)-1 and layers[i+1]['TopLayer'] > toe_level
                 else (top + toe_level) / 2
