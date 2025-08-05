@@ -74,7 +74,7 @@ class PDFhelper:
         return ToeLevel,SumTanForce,WallMass,WeightWallTotal
     
     def extractPlotResults(PlotResults):
-        return (PlotResults.get('PlotLevels'),
+        return [PlotResults.get('PlotLevels'),
             PlotResults.get('e1'),
             PlotResults.get('e2'),
             PlotResults.get('Moment'),
@@ -82,7 +82,7 @@ class PDFhelper:
             PlotResults.get('DW'),
             PlotResults.get('enet'),
             PlotResults.get('JU'),
-        )
+        ]
 
     def extractSheetPileInput(Analysis, SheetPileAddOnResults):
         Sheetpile = SheetPileAddOnResults.get('SheetPileProfile')
@@ -201,6 +201,15 @@ class PDFhelper:
         pdf.ln(2*th)
         return pdf
     
+    def fillSheetpileAddOn(names,texts,sheetpileinput,th,col_width,pdf):
+        for name,text,sheetpile in zip(names,texts,sheetpileinput):
+            pdf.cell(col_width[0], 2*th, str(text+':'), border=1)
+            pdf.cell(col_width[1], 2*th, str(sheetpile), border=1)
+            pdf.cell(col_width[1], 2*th, str(name), border=1)
+            pdf.ln(2*th)
+        return pdf
+
+
     def appendSoillayerData(SoilData, SoilLayers, pdf, col_width, th, sidetxt):
         pdf.ln(2*th)
         pdf.cell(200, 10, txt = sidetxt, 
@@ -227,4 +236,19 @@ class PDFhelper:
                     pdf.cell(col_width[1], 2*th, str(datum), border=1)
         
             pdf.ln(2*th)
-        return
+        return pdf
+    
+    # Fill a single row of cells
+    def writeTableRow(pdf, values, col_width, height):
+        for val in values:
+            pdf.cell(col_width, height, str(val), border=1)
+        pdf.ln(height)
+
+    # Fill a row with a key, value, and optional unit
+    def writeKeyValueRow(pdf, key, value, col1_width, col2_width, height, unit=None):
+        pdf.cell(col1_width, height, str(key), border=1)
+        pdf.cell(col2_width, height, str(value), border=1)
+        if unit:
+            pdf.cell(col2_width, height, str(unit), border=1)
+        pdf.ln(height)
+            
