@@ -59,26 +59,36 @@ Version = '2.1'
 
 ############### GUI Functions
 
-def OpenSpooks():
+def OpenSpooks(dev_mode = True, spoof_path = "C:/Dummy/WinSpooks.exe"):
     
     ################### OPEN WINSPOOKS ###################################
     ######### Check in WinSpooks is running - if not -> Run
     ######### (necessary for license check)
 
-    res = subprocess.check_output(['tasklist']).splitlines()
-    winspooks = []
-    for i in range(0,len(res)):
-        p = str(res[i])
-        if 'WinSpooks.exe' in p:
-            winspooks.append(i) 
-    
-    if winspooks == []:
+    try:
+        res = subprocess.check_output(['tasklist'], text=True).splitlines()
+    except Exception as e:
+        print("Error checking tasklist:", e)
+        return
 
-        spooks_path = Path("C:/Program Files (x86)/WinSpooks/WinSpooks.exe")
-        subprocess.Popen([str(spooks_path)])
-        time.sleep(0.5)
+    is_running = any('WinSpooks.exe' in line for line in res)
+
+    if not is_running:
+        # Determine the path (real or spoofed)
+        if dev_mode:
+            spooks_path = Path(spoof_path) if spoof_path else Path("C:/FakeProgramFiles/WinSpooks/WinSpooks.exe")
+            print(f"Dev mode: Would launch {spooks_path}")
+            return  # Skip launching in dev mode
+        else:
+            spooks_path = Path("C:/Program Files (x86)/WinSpooks/WinSpooks.exe")
+            if spooks_path.exists():
+                subprocess.Popen([str(spooks_path)])
+                time.sleep(0.5)
+            else:
+                print(f"WinSpooks.exe not found at {spooks_path}")
     
-    res = None  ## Deleting list
+    # Optional cleanup (not necessary in Python, but fine)
+    res = None
     
     
 
