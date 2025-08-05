@@ -99,54 +99,6 @@ def TemporaryWorkingDirectory():
     return TemporaryPath
 
 
-
-def ImportExcel(input_path):
-    
-    #### Loading excel workbook
-    xlsx_filename=input_path
-    with open(xlsx_filename, "rb") as f:
-        in_mem_file = io.BytesIO(f.read())
-    
-    wb = load_workbook(in_mem_file, data_only=True)
-            
-    ## Sheets
-    INFO =  wb['INFO']
-    GeneralInfo = wb['General_information']
-    Stratification = wb['Stratification']
-    Wall = wb['Wall']
-    Water = wb['Water']
-    Add_pres = wb['Additional_pressure_profiles']
-    Analyses = wb['Analyses']
-    LoadComb = wb['Load_combinations']
-    SheetPileAddOn = wb['Addon - Sheet Pile Wall']
-    
-    
-    ########### 3.1. LOADING DATA SHEETS TO PANDAS DATAFRAMES #########
-
-    
-    data_array = [INFO['A1':'H28'], GeneralInfo['A3':'B7'], Stratification['A4':'K289'], Wall['A3':'B5'], Water['A3':'A5'], Add_pres['A3':'C114'], Analyses['A3':'AA56'], LoadComb['A3':'M42'], SheetPileAddOn['A1':'G30']]
-    ###### This returns an array with all the data post-processing. So docready_array[0] is INFO, docready_array[1] is stratification etc.
-    docready_array = utils.data_rows_arr(data_array)
-
-
-    INFO = pd.DataFrame(docready_array[0])
-    Stratification = docready_array[1]
-    InputFileID = str(INFO.iloc[27,1])
-
-    ImportData = {'InputFileID': InputFileID, 
-                  'GeneralInfo': docready_array[1],
-                  'Stratification': docready_array[2],
-                  'Wall': docready_array[3],
-                  'Water': docready_array[4],
-                  'AddPress': docready_array[5],
-                  'Analyses': docready_array[6],
-                  'LoadComb': docready_array[7],
-                  'SheetPileAddOn': docready_array[8]}
-    
-
-    return ImportData
-
-    
 def PlotResults(FeederOutput):
     
     print('Plotting results...')
