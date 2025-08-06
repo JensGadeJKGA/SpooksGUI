@@ -15,7 +15,7 @@ class soilprofiles():
         if pd.isnull(Stratification.iloc[ilocrange[0],ilocrange[1]]) == True: ## if no value entered in slope -> value is 0
             Stratification.iloc[ilocrange[0],ilocrange[1]] = 0.00
             
-        SoilProfiles[SoilProfile]['Front']['Slope'] = float(format(Stratification.iloc[ilocrange[0],ilocrange[1]], '.2f'))
+        SoilProfiles[SoilProfile]['Front']['Slope'] = utils.safe_float(Stratification.iloc[ilocrange[0], ilocrange[1]])
 
         ## Start of front stratigraphy layers soil profile 1
         index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Front']

@@ -4,7 +4,10 @@ from SpooksHelperLib.Utils import utils
 import numpy as np
         
 class generators():
-    def GenerateAddPressProfiles(Add_pres):
+    def __init__(self):
+        pass
+    
+    def GenerateAddPressProfiles(self,Add_pres):
         
         AdditionalPressures = {'AP1':{'z': [],'ez':[]},
                             'AP2': {'z': [],'ez':[]},
@@ -57,7 +60,7 @@ class generators():
         
         return SheetPileAddOnInput
     
-    def GenerateSoilProfiles(Stratification):
+    def GenerateSoilProfiles(self,Stratification):
 
         SoilProfiles = {'SP1': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
                         'SP2': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
@@ -86,14 +89,14 @@ class generators():
         return SoilProfiles
     
    
-    def GenerateAnalyses(input_path):
-
+    def GenerateAnalyses(self,input_path):
+        u = utils()
         ## Importing Excel file
         ImportData = utils.ImportExcel(input_path)
         Analyses = ImportData.get('Analyses')
 
         ## Check if input file version matches GUI version
-        InputFileStatus = utils.InputFileIDChecker(ImportData.get('InputFileID'))
+        InputFileStatus = u.InputFileIDChecker(ImportData.get('InputFileID'))
 
         if InputFileStatus == 'OK':
             print("OK")
@@ -111,6 +114,7 @@ class generators():
             print(RangeOfAnalyses)
             MinAnalysis = RangeOfAnalyses.get('MinAnalysis')
             MaxAnalysis = RangeOfAnalyses.get('MaxAnalysis')
+            u = utils()
 
             ### Defining correct number of decimals for integers and floating numbers
             for Analysis in range(MinAnalysis, MaxAnalysis):
@@ -148,7 +152,7 @@ class generators():
                             Analyses.iloc[Analysis,17] + Analyses.iloc[Analysis,18],
                             Analyses.iloc[Analysis,18]
                         ):
-                            Analysis_dict = utils.make_analysis_dict(
+                            Analysis_dict = u.make_analysis_dict(
                                 Analyses, Analysis, ImportData,
                                 AnchorLevel,
                                 AInclination,
@@ -160,7 +164,7 @@ class generators():
                             GeneratedAnalyses.append(Analysis_dict)
                             geninfoarr[0] += 1
                     else:
-                        Analysis_dict = utils.make_analysis_dict(
+                        Analysis_dict = u.make_analysis_dict(
                             Analyses, Analysis, ImportData,
                             Analyses.iloc[Analysis,16],
                             AInclination,
@@ -172,7 +176,7 @@ class generators():
                         GeneratedAnalyses.append(Analysis_dict)
                         geninfoarr[0] += 1
                 else:
-                    Analysis_dict = utils.make_analysis_dict(
+                    Analysis_dict = u.make_analysis_dict(
                         Analyses, Analysis, ImportData,
                         None,
                         None,
@@ -185,14 +189,14 @@ class generators():
                     geninfoarr[0] += 1
 
                 geninfoarr[1] += 1
-
+            a = analysisclass()
             ## Append soil layers data to analysis dictionary
-            analysisclass.AddSoilToAnalysis(GeneratedAnalyses, generators.GenerateSoilProfiles(ImportData.get('Stratification')))
+            a.AddSoilToAnalysis(GeneratedAnalyses, self.GenerateSoilProfiles(ImportData.get('Stratification')))
 
             ## Append additional pressure profiles
-            analysisclass.AddPressureToAnalysis(GeneratedAnalyses, generators.GenerateAddPressProfiles(ImportData.get('AddPress')))
+            a.AddPressureToAnalysis(GeneratedAnalyses, self.GenerateAddPressProfiles(ImportData.get('AddPress')))
 
             ## Append design parameters
-            analysisclass.AddDesignParameters(GeneratedAnalyses, ImportData.get('LoadComb'))
+            a.AddDesignParameters(GeneratedAnalyses, ImportData.get('LoadComb'))
 
             return GeneratedAnalyses

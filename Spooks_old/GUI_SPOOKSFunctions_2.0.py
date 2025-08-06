@@ -1254,7 +1254,7 @@ def GenerateAnalyses(input_path):
         GeneratedAnalyses = []
         ## Initial analysis number
         AnalysisNo = 0
-        ## Parent analysis (Referring to Excel input file)
+        ## Parent analysis (Referring to Excel iAnalysesRangenput file)
         ParentAnalysis = 0
         
         ## Project

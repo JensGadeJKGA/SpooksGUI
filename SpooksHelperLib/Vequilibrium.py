@@ -5,6 +5,7 @@ from SpooksHelperLib.Generators import generators
 from SpooksHelperLib.SoilProfiles import soilprofiles
 from SpooksHelperLib.SPOOKS import spooksfile
 from SpooksHelperLib.Utils import utils
+from SpooksHelperLib.SPOOKS import spooksfile
 
 class verticalEquilibrium():
     def soilLayer(self, soillayer):
@@ -90,3 +91,48 @@ class verticalEquilibrium():
             
             
         return VerticalEquilibriumOutput
+    
+    def SPOOKSFeeder(input_path,calcno,pb,tabcalc,logtxt,tk):    
+        FeederOutput = []
+        
+        
+        GeneratedAnalyses = generators.GenerateAnalyses(input_path)
+        
+        
+        ## Progress bar maximum
+        pb['maximum'] = len(GeneratedAnalyses)-1
+        pb.update() ## update progress bar
+        
+        ## Loop through all generated analyses and append output to FeederOutput
+        ReportErrors = []
+        for Analysis in GeneratedAnalyses:
+            #print(Analysis)
+            
+            ### PROGRESS BAR AND CALCULATION NO UPDATE
+            AnalysisNo = Analysis.get('AnalysisNo')
+            calcno.configure(text = str(AnalysisNo)) ## Calculation number for GUI
+            tabcalc.update_idletasks()
+            pb['value'] = AnalysisNo
+            pb.update() ## update progress bar
+            
+            ExecuteOutput = spooksfile.ExecuteSPOOKS(Analysis,logtxt,tk)
+            
+            ReportErrors = ExecuteOutput.get('Errors')
+        
+            GetResultsOutput = spooksfile.GetResults(ExecuteOutput)
+        
+        
+        #else:
+        #    print("FAILED")
+        #    calcno.configure(text = 'Calculation failed') ## Calculation number for GUI
+        #    tabcalc.update_idletasks()
+        #    break
+
+                
+            
+            FeederOutput.append({'FeedAnalysis': Analysis,
+                                'ExecuteOutput': ExecuteOutput,
+                                'GetResultsOutput': GetResultsOutput})
+            
+        
+        return FeederOutput

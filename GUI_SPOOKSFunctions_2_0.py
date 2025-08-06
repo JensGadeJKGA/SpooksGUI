@@ -43,7 +43,7 @@ from tkinter import filedialog
 
 ################ Version ##################
 
-Version = '2.1'
+Version = '3'
 
 ################ Input file ID ############
 
@@ -59,7 +59,7 @@ Version = '2.1'
 
 ############### GUI Functions
 
-def OpenSpooks(dev_mode = True, spoof_path = "C:/Dummy/WinSpooks.exe"):
+def OpenSpooks(dev_mode = False, spoof_path = None):
     
     ################### OPEN WINSPOOKS ###################################
     ######### Check in WinSpooks is running - if not -> Run

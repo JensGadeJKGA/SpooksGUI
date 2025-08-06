@@ -11,24 +11,32 @@ class analysisclass():
     
     def AnalysesRange(Analyses):
         null = []
-        # This loop aims for the first cell in which the user hasn't entered data in the following order (0: Subject text, 1: Soil profile, 2: Drained or undrained, 3: water front level, 4: water back level, 5: load comb, 6: consequence class, 7: alpha value, 8: front load value, 9: back load value, 10: zR value, 11 is missing, 12: iA value, 13: also iA value, 14: iC value)
         for i in range(15):
             if i != 11:
-                null[i] = np.amin(np.where(pd.isnull(Analyses.iloc[:,i])))
+                try:
+                    # Find first row with null in column i
+                    first_null = np.amin(np.where(pd.isnull(Analyses.iloc[:, i])))
+                except ValueError:
+                    # No nulls found — assume end of DataFrame is valid
+                    first_null = len(Analyses)
+                null.append(first_null)
             else:
-                null[i] = None
+                null.append(None)
 
-        
-        ### Overall first row (analysis row) with incomplete data.
-        index_maxAnalysis = min(*null)
-        
-        RangeOfAnalyses = {'MinAnalysis': 2,
-                        'MaxAnalysis': index_maxAnalysis}
-        
+        # Get the minimum valid analysis index
+        filtered_nulls = [val for val in null if val is not None]
+        index_maxAnalysis = min(filtered_nulls)
+
+        RangeOfAnalyses = {
+            'MinAnalysis': 2,
+            'MaxAnalysis': index_maxAnalysis
+        }
+
         return RangeOfAnalyses
 
+
     
-    def AddSoilToAnalysis(GeneratedAnalyses,SoilProfiles):
+    def AddSoilToAnalysis(self,GeneratedAnalyses,SoilProfiles):
         
         ## Loop through all generated analyses and append stratigraphy input
         for Analysis in GeneratedAnalyses:
@@ -56,7 +64,7 @@ class analysisclass():
         
 
 
-    def AddPressureToAnalysis(GeneratedAnalyses,AdditionalPressures):
+    def AddPressureToAnalysis(self,GeneratedAnalyses,AdditionalPressures):
         
         ## Loop through all generated analyses and append stratigraphy input
         for Analysis in GeneratedAnalyses:
@@ -111,7 +119,7 @@ class analysisclass():
             Analysis['DesignWaterDensity'] = float(Analysis.get('WaterDensity'))*float(PartialSafetyFactors.get('f_wat'))
             Analysis['PartialSafetyFactors'] = PartialSafetyFactors
     
-    def SoilLayerAnalysis(SoilLayers, PartialSafetyFactors, Analysis, Analysisspot):
+    def SoilLayerAnalysis(self, SoilLayers, PartialSafetyFactors, Analysis, Analysisspot):
         DesignSoilLayers = None
         Alpha = float(Analysis.get('Alpha'))
         

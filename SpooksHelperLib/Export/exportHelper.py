@@ -1,5 +1,5 @@
 import numpy as np
-from Steel_Sheet_Pile_Wall import steel_sheet_pile_implementer
+from SpooksHelperLib.Steel_Sheet_Pile_Wall import steel_sheet_pile_implementer
 
 class exportHelper:
     def __init__(self):

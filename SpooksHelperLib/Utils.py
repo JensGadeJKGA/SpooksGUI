@@ -81,31 +81,37 @@ class utils:
         return AdditionalPressures
 
     def PartialSafetyFactors(LoadComb, loadcombinations, cc):
-        index_CC2 = np.where((LoadComb.iloc[:,0]) == 'CC2')
-        index_CC2 = index_CC2[0][0]
-        index_CC3 = np.where((LoadComb.iloc[:,0]) == 'CC3')
-        index_CC3 = index_CC3[0][0]
+        LC = pd.DataFrame(LoadComb)
+        index_CC2 = np.where((LC.iloc[:,0]) == 'CC2')[0][0]
+        index_CC3 = np.where((LC.iloc[:,0]) == 'CC3')[0][0]
         
-        for i in range(index_CC2+2,index_CC3):
-            if LoadComb.iloc[i,0] != None:
-                Loadcombination = LoadComb.iloc[i,0]
+        # Ensure the cc key exists
+        if cc not in loadcombinations:
+            loadcombinations[cc] = {}
 
-                            
-                PartialSafetyFactors = {'f_gamf': float(LoadComb.iloc[i,1]),
-                                        'f_qf':   float(LoadComb.iloc[i,2]),
-                                        'f_cf':   float(LoadComb.iloc[i,3]),
-                                        'f_cuf':  float(LoadComb.iloc[i,4]),
-                                        'f_phif': float(LoadComb.iloc[i,5]),
-                                        'f_wat':  float(LoadComb.iloc[i,6]),
-                                        'f_AP':   float(LoadComb.iloc[i,7]),
-                                        'f_gamb': float(LoadComb.iloc[i,8]),
-                                        'f_qb':   float(LoadComb.iloc[i,9]),
-                                        'f_cb':   float(LoadComb.iloc[i,10]),
-                                        'f_cub':  float(LoadComb.iloc[i,11]),
-                                        'f_phib': float(LoadComb.iloc[i,12])}
+        for i in range(index_CC2 + 2, index_CC3):
+            if pd.notna(LC.iloc[i, 0]):
+                Loadcombination = str(LC.iloc[i, 0])
                 
-                loadcombinations.get(cc)[str(Loadcombination)] = PartialSafetyFactors
+                PartialSafetyFactors = {
+                    'f_gamf': float(LC.iloc[i, 1]),
+                    'f_qf':   float(LC.iloc[i, 2]),
+                    'f_cf':   float(LC.iloc[i, 3]),
+                    'f_cuf':  float(LC.iloc[i, 4]),
+                    'f_phif': float(LC.iloc[i, 5]),
+                    'f_wat':  float(LC.iloc[i, 6]),
+                    'f_AP':   float(LC.iloc[i, 7]),
+                    'f_gamb': float(LC.iloc[i, 8]),
+                    'f_qb':   float(LC.iloc[i, 9]),
+                    'f_cb':   float(LC.iloc[i, 10]),
+                    'f_cub':  float(LC.iloc[i, 11]),
+                    'f_phib': float(LC.iloc[i, 12])
+                }
+
+                loadcombinations[cc][Loadcombination] = PartialSafetyFactors
+
         return loadcombinations
+
     
 
     def ImportExcel(input_path):
@@ -140,14 +146,14 @@ class utils:
         InputFileID = str(INFO.iloc[27,1])
 
         ImportData = {'InputFileID': InputFileID, 
-                    'GeneralInfo': docready_array[1],
-                    'Stratification': docready_array[2],
-                    'Wall': docready_array[3],
-                    'Water': docready_array[4],
-                    'AddPress': docready_array[5],
-                    'Analyses': docready_array[6],
+                    'GeneralInfo': pd.DataFrame(docready_array[1]),
+                    'Stratification': pd.DataFrame(docready_array[2]),
+                    'Wall': pd.DataFrame(docready_array[3]),
+                    'Water': pd.DataFrame(docready_array[4]),
+                    'AddPress': pd.DataFrame(docready_array[5]),
+                    'Analyses': pd.DataFrame(docready_array[6]),
                     'LoadComb': docready_array[7],
-                    'SheetPileAddOn': docready_array[8]}
+                    'SheetPileAddOn': pd.DataFrame(docready_array[8])}
     
     
 
@@ -189,8 +195,15 @@ class utils:
         ### Find CC3 partial safety factors
         LoadCombinations['CC3'] = utils.PartialSafetyFactors(LoadComb, LoadCombinations, 'CC3')
 
+        return LoadCombinations
+
     def make_analysis_dict(self,Analyses, Analysis, ImportData, anchor_level, anchor_inclination, prescribed_anchor_force, vararr, geninfoarr):
         from SpooksHelperLib.Generators import generators
+        sheetpile_addon = ImportData.get('SheetPileAddOn')
+        SheetPileAddOnInput = {}
+        if sheetpile_addon is not None and not sheetpile_addon.empty:
+            SheetPileAddOnInput = generators.GenerateSheetPileAddOnInput(sheetpile_addon)
+
         return {
                 'AnalysisNo': geninfoarr[0],
                 'ParentAnalysis': geninfoarr[1],
@@ -233,7 +246,7 @@ class utils:
                 'KN': Analyses.iloc[Analysis, 24],
                 'KP': Analyses.iloc[Analysis, 25],
                 'SC': Analyses.iloc[Analysis, 26],
-                'SheetPileAddOnInput': generators.GenerateSheetPileAddOnInput(ImportData.get('SheetPileAddOn'))
+                'SheetPileAddOnInput': SheetPileAddOnInput
             }
     
     def AddSpaces(items):
@@ -345,3 +358,9 @@ class utils:
         maxmomlvl = momentlevel[moment_index]
 
         return maxshear, maxshearlevel, maxmom, maxmomlvl
+
+    def safe_float(val, default=None, precision=2):
+        try:
+            return float(format(float(val), f'.{precision}f'))
+        except (ValueError, TypeError):
+            return default

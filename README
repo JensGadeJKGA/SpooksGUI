@@ -1,0 +1,9 @@
+Run the shortcut on the desktop to run the winspooks gui.
+
+In case there is no shortcut, run the file GUI_SPOOKSFunctions_2.0.exe from this directory.
+
+to run the program in dev mode, locate the file GUI_SPOOKSFuncions_2.0.py and follow these steps:
+1.  Open the file GUI_SPOOKSFuncions_2.0.py in a text editor
+2.  Locate the function "OpenSpooks"
+3.  change the parameter dev_mode from false to true
+4.  change the value of the parameter "spoof_path" from None to "C:/Dummy/WinSpooks.exe"
