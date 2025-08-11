@@ -261,7 +261,7 @@ class utils:
             returnitem += (space+item)
         return returnitem
 
-    def linesplitter(lines, check, checkTwo=None, indice=0):
+    def linesplitter(self,lines, check, checkTwo=None, indice=0):
         for line in lines:
             if check in line or (checkTwo and checkTwo in line):
                 parts = line.split()

@@ -136,3 +136,38 @@ class verticalEquilibrium():
             
         
         return FeederOutput
+    
+    def SPOOFSFeeder(InputFile, calcno, pb, tabcalc, logtxt, tk):
+            print("[DEV] Using spoofed SPOOKSFeeder output for testing")
+
+            # This mimics the FeederOutput structure needed by plot.py
+            fake_analysis = {
+                'GetResultsOutput': {
+                    'Analysis': {
+                        'ParentAnalysis': 1,
+                        'Subject': 'Test Wall'
+                    },
+                    'PlotResults': {
+                        'MaxMoment': 150.0,
+                        'MaxShearForce': 75.0
+                    },
+                    'Results': {
+                        'ToeLevel': -2.5,
+                        'AnchorForce': 25.0
+                    }
+                },
+                # If your Analysis.py functions expect soil, pressure, etc., add them here
+                'SoilProfile': 'SP1',
+                'SoilLayersBack': [],
+                'SoilLayersFront': [],
+                'AddPress_ez': [],
+                'AddPress_z': [],
+                'LoadFront': 10,
+                'LoadBack': 5,
+                'WaterDensity': 10,
+                'Alpha': 1,
+                'ConsequenceClass': 'CC1',
+                'LoadCombination': 'LC1'
+            }
+
+            return [fake_analysis]
