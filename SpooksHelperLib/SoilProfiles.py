@@ -8,9 +8,6 @@ import numpy as np
 
 ###### This function normalizes the soil profile generation
 class soilprofiles():
-    def __init__(self):
-        pass
-    
     def soilprofiles(name, Stratification, SoilProfiles, ilocrange, i):
         #### Soil profile X
         SoilProfile = name
@@ -89,6 +86,7 @@ class soilprofiles():
                 
         
             Soil = ""
+        
             Soil = utils.AddSpaces(S_temp)
             L.append(Soil)
         

@@ -96,7 +96,6 @@ def OpenSpooks(dev_mode = False, spoof_path = None):
 ################### 1. OPEN WINSPOOKS ###################################
 ######### Check in WinSpooks is running - if not -> Run
 ######### (necessary for license check)
-######### Add dev_mode = True to launch the gui in developer mode (runs the gui without spooks)
 
 
 OpenSpooks()

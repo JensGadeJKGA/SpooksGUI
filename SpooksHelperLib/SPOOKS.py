@@ -6,10 +6,7 @@ from SpooksHelperLib.Utils import utils
 from SpooksHelperLib.SoilProfiles import soilprofiles
 
 class spooksfile():
-    def __init__(self):
-        pass
-
-    def anchorLevel(self, Anchorlevel, PrescrbAnchorForce, anchCoeffVars):
+    def anchorLevel(Anchorlevel, PrescrbAnchorForce, anchCoeffVars):
         baseArr = [format(anchCoeffVars["iA"],'.2f'), 
                         format(anchCoeffVars["iB"],'.2f'),
                         format(anchCoeffVars["iC"],'.2f'), 
@@ -192,7 +189,7 @@ class spooksfile():
         Output = self.GenerateSPOOKSInputFile(Analysis)
         
         Analysis = Output.get('Analysis')
-        AnalysisNo = dict(Analysis).get('AnalysisNo')
+        AnalysisNo = Analysis.get('AnalysisNo')
         InputFile = Output.get('InputFile')
         InputFileDir = Output.get('InputFileDir')
         SPOOKSPlotFile = Output.get('SPOOKSPlotFile')
