@@ -80,36 +80,43 @@ class utils:
     
         return AdditionalPressures
 
-    def PartialSafetyFactors(LoadComb, loadcombinations, cc):
+    def PartialSafetyFactors(LoadComb, loadcombinations):
         LC = pd.DataFrame(LoadComb)
-        index_CC2 = np.where((LC.iloc[:,0]) == 'CC2')[0][0]
-        index_CC3 = np.where((LC.iloc[:,0]) == 'CC3')[0][0]
         
-        # Ensure the cc key exists
-        if cc not in loadcombinations:
-            loadcombinations[cc] = {}
-
-        for i in range(index_CC2 + 2, index_CC3):
-            if pd.notna(LC.iloc[i, 0]):
-                Loadcombination = str(LC.iloc[i, 0])
-                
-                PartialSafetyFactors = {
-                    'f_gamf': float(LC.iloc[i, 1]),
-                    'f_qf':   float(LC.iloc[i, 2]),
-                    'f_cf':   float(LC.iloc[i, 3]),
-                    'f_cuf':  float(LC.iloc[i, 4]),
-                    'f_phif': float(LC.iloc[i, 5]),
-                    'f_wat':  float(LC.iloc[i, 6]),
-                    'f_AP':   float(LC.iloc[i, 7]),
-                    'f_gamb': float(LC.iloc[i, 8]),
-                    'f_qb':   float(LC.iloc[i, 9]),
-                    'f_cb':   float(LC.iloc[i, 10]),
-                    'f_cub':  float(LC.iloc[i, 11]),
-                    'f_phib': float(LC.iloc[i, 12])
-                }
-                
-                loadcombinations[cc][Loadcombination] = PartialSafetyFactors
-                print(loadcombinations[cc][Loadcombination])
+        # Find indices of consequence classes
+        index_CC2 = np.where(LC.iloc[:, 0] == 'CC2')[0][0]
+        index_CC3 = np.where(LC.iloc[:, 0] == 'CC3')[0][0]
+        
+        # Define the ranges for each consequence class
+        cc_ranges = {
+            'CC2': (index_CC2 + 2, index_CC3),
+            'CC3': (index_CC3 + 2, len(LC))
+        }
+        
+        for cc, (start, end) in cc_ranges.items():
+            if cc not in loadcombinations:
+                loadcombinations[cc] = {}
+            
+            for i in range(start, end):
+                if pd.notna(LC.iloc[i, 0]):
+                    Loadcombination = str(LC.iloc[i, 0]).strip()
+                    
+                    PartialSafetyFactors = {
+                        'f_gamf': float(LC.iloc[i, 1]),
+                        'f_qf':   float(LC.iloc[i, 2]),
+                        'f_cf':   float(LC.iloc[i, 3]),
+                        'f_cuf':  float(LC.iloc[i, 4]),
+                        'f_phif': float(LC.iloc[i, 5]),
+                        'f_wat':  float(LC.iloc[i, 6]),
+                        'f_AP':   float(LC.iloc[i, 7]),
+                        'f_gamb': float(LC.iloc[i, 8]),
+                        'f_qb':   float(LC.iloc[i, 9]),
+                        'f_cb':   float(LC.iloc[i, 10]),
+                        'f_cub':  float(LC.iloc[i, 11]),
+                        'f_phib': float(LC.iloc[i, 12])
+                    }
+                    
+                    loadcombinations[cc][Loadcombination] = PartialSafetyFactors
 
         return loadcombinations
 
@@ -186,18 +193,6 @@ class utils:
         return val if isinstance(val, (int, float)) else default
     
     
-    def GeneratePartialCoefficientDictionary(LoadComb):
-        LoadCombinations = {'CC2': {},
-                            'CC3': {}}
-                
-        ### Find CC2 partial safety factors
-        LoadCombinations['CC2'] = utils.PartialSafetyFactors(LoadComb, LoadCombinations, 'CC2')
-            
-        ### Find CC3 partial safety factors
-        LoadCombinations['CC3'] = utils.PartialSafetyFactors(LoadComb, LoadCombinations, 'CC3')
-
-        return LoadCombinations
-
     def make_analysis_dict(self,Analyses, Analysis, ImportData, anchor_level, anchor_inclination, prescribed_anchor_force, vararr, geninfoarr):
         from SpooksHelperLib.Generators import generators
         sheetpile_addon = ImportData.get('SheetPileAddOn')

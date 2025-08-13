@@ -111,7 +111,8 @@ class generators():
 
             ### Ranges of analyses
             RangeOfAnalyses = analysisclass.AnalysesRange(Analyses)
-            print(RangeOfAnalyses)
+            
+            print("Range of analyses: ",RangeOfAnalyses)
             MinAnalysis = RangeOfAnalyses.get('MinAnalysis')
             MaxAnalysis = RangeOfAnalyses.get('MaxAnalysis')
             u = utils()
@@ -160,7 +161,7 @@ class generators():
                                 vararr,
                                 geninfoarr
                             )
-                            print(Analysis_dict)
+                            #print(Analysis_dict)
                             GeneratedAnalyses.append(Analysis_dict)
                             geninfoarr[0] += 1
                     else:
@@ -172,7 +173,7 @@ class generators():
                             vararr,
                             geninfoarr
                         )
-                        print(Analysis_dict)
+                        #print(Analysis_dict)
                         GeneratedAnalyses.append(Analysis_dict)
                         geninfoarr[0] += 1
                 else:
@@ -184,7 +185,7 @@ class generators():
                         vararr,
                         geninfoarr
                     )
-                    print(Analysis_dict)
+                    #print(Analysis_dict)
                     GeneratedAnalyses.append(Analysis_dict)
                     geninfoarr[0] += 1
 

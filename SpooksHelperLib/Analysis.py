@@ -89,53 +89,106 @@ class analysisclass():
                         
 
 
-    def AddDesignParameters(self,GeneratedAnalyses,LoadComb):
-        
-        LoadCombinations = utils.GeneratePartialCoefficientDictionary(LoadComb)
-        print(LoadCombinations)
-        
-        
-        for Analysis in GeneratedAnalyses:
-            cc = Analysis.get('ConsequenceClass')
-            lc = Analysis.get('LoadCombination')
-            print(f"ConsequenceClass: {cc}, LoadCombination: {lc}")
+    def AddDesignParameters(self, GeneratedAnalyses, LoadComb):
+        LoadCombinations = {'CC2': {},
+                            'CC3': {}}
+        LoadCombinatione = utils.PartialSafetyFactors(LoadComb, LoadCombinations)
+
+        for analysis in GeneratedAnalyses:
+            cc = analysis.get('ConsequenceClass')
+            lc_raw = analysis.get('LoadCombination')
+            
+            # Clean the LoadCombination string
+            lc = str(lc_raw).strip()
+            PartialSafetyFactors = LoadCombinatione.get(cc).get(lc)
+
+            # Get the consequence class dictionary
             partial_class = LoadCombinations.get(cc)
-            print(f"Partial class: {partial_class}")
-            if partial_class is not None:
-                PartialSafetyFactors = partial_class.get(partial_class)
-            else:
-                PartialSafetyFactors = None
-            print(f"PartialSafetyFactors: {PartialSafetyFactors}")
 
+            if partial_class is None:
+                raise ValueError(f"Unknown ConsequenceClass: {cc}")
+
+            # Try exact match first
+            #PartialSafetyFactors = partial_class.get(lc)
+
+            # If not found, try case-insensitive & strip match
             if PartialSafetyFactors is None:
-                raise ValueError(f"PartialSafetyFactors is None for ConsequenceClass={cc} and LoadCombination={lc}")
+                for key in partial_class.keys():
+                    if key.strip().lower() == lc.lower():
+                        PartialSafetyFactors = partial_class[key]
+                        break
 
-            # Now call SoilLayerAnalysis safely
-            Analysis['DesignSoilLayersBack'] = self.SoilLayerAnalysis(Analysis.get('SoilLayersBack'), PartialSafetyFactors, Analysis, 'DesignSoilLayersBack')
+            # If still not found, raise error
+            if PartialSafetyFactors is None:
+                raise ValueError(f"No PartialSafetyFactors found for ConsequenceClass={cc} and LoadCombination={lc}")
 
-            PartialSafetyFactors = LoadCombinations.get(Analysis.get('ConsequenceClass')).get(Analysis.get('LoadCombination'))
-            
-            #Soils
-            ## Generate design soil layers (back)
-            Analysis['DesignSoilLayersBack'] = self.SoilLayerAnalysis(Analysis.get('SoilLayersBack'), PartialSafetyFactors, Analysis, 'DesignSoilLayersBack')
-            
-            
-            ## Generate design soil layers (front)
-            Analysis['DesignSoilLayersFront'] = self.SoilLayerAnalysis(Analysis.get('SoilLayersFront'), PartialSafetyFactors, Analysis, 'DesignSoilLayersFront')
-            
-            #Additional pressure 
-            DesignAddPress_ez = []
-            
-            for ez in Analysis.get('AddPress_ez'):
-                DesignAddPress_ez.append(float(ez)*float(PartialSafetyFactors.get('f_AP')))
-                
-            Analysis['DesignAddPress_ez'] = DesignAddPress_ez
-            
-            #Loads and water density
-            Analysis['DesignLoadFront'] = float(Analysis.get('LoadFront'))*float(PartialSafetyFactors.get('f_qf'))
-            Analysis['DesignLoadBack'] = float(Analysis.get('LoadBack'))*float(PartialSafetyFactors.get('f_qb'))
-            Analysis['DesignWaterDensity'] = float(Analysis.get('WaterDensity'))*float(PartialSafetyFactors.get('f_wat'))
-            Analysis['PartialSafetyFactors'] = PartialSafetyFactors
+            alpha = float(analysis.get('Alpha'))
+
+            # --- SOILS ---
+            analysis['DesignSoilLayersBack'] = self.SoilLayerAnalysisBack(
+                analysis.get('SoilLayersBack'), PartialSafetyFactors, alpha
+            )
+            analysis['DesignSoilLayersFront'] = self.SoilLayerAnalysisFront(
+                analysis.get('SoilLayersFront'), PartialSafetyFactors, alpha
+            )
+
+            # --- ADDITIONAL PRESSURE ---
+            analysis['DesignAddPress_ez'] = [
+                float(ez) * float(PartialSafetyFactors.get('f_AP'))
+                for ez in analysis.get('AddPress_ez')
+            ]
+
+            # --- LOADS & WATER DENSITY ---
+            analysis['DesignLoadFront'] = float(analysis.get('LoadFront')) * float(PartialSafetyFactors.get('f_qf'))
+            analysis['DesignLoadBack'] = float(analysis.get('LoadBack')) * float(PartialSafetyFactors.get('f_qb'))
+            analysis['DesignWaterDensity'] = float(analysis.get('WaterDensity')) * float(PartialSafetyFactors.get('f_wat'))
+
+            # Store the partial safety factors for reference
+            analysis['PartialSafetyFactors'] = PartialSafetyFactors
+
+
+
+    def SoilLayerAnalysisBack(self, SoilLayers, PartialSafetyFactors, alpha):
+        """Apply partial safety factors for BACK soil layers."""
+        import numpy as np
+        return [
+            {
+                'TopLayer': float(sl.get('TopLayer')),
+                'Gamma_d':  float(sl.get('Gamma_d')) / (PartialSafetyFactors.get('f_gamb') ** alpha),
+                'Gamma_m':  float(sl.get('Gamma_m')) / (PartialSafetyFactors.get('f_gamb') ** alpha),
+                'cu':       float(sl.get('cu')) / (PartialSafetyFactors.get('f_cub') ** alpha),
+                'c':        float(sl.get('c')) / (PartialSafetyFactors.get('f_cb') ** alpha),
+                'phi':      np.degrees(np.arctan(np.tan(np.radians(float(sl.get('phi')))) /
+                                                (PartialSafetyFactors.get('f_phib') ** alpha))),
+                'i':        float(sl.get('i')),
+                'r':        float(sl.get('r')),
+                'Description': sl.get('Description'),
+                'KeepDrained': sl.get('KeepDrained')
+            }
+            for sl in SoilLayers
+        ]
+
+
+    def SoilLayerAnalysisFront(self, SoilLayers, PartialSafetyFactors, alpha):
+        """Apply partial safety factors for FRONT soil layers."""
+        import numpy as np
+        return [
+            {
+                'TopLayer': float(sl.get('TopLayer')),
+                'Gamma_d':  float(sl.get('Gamma_d')) / (PartialSafetyFactors.get('f_gamf') ** alpha),
+                'Gamma_m':  float(sl.get('Gamma_m')) / (PartialSafetyFactors.get('f_gamf') ** alpha),
+                'cu':       float(sl.get('cu')) / (PartialSafetyFactors.get('f_cuf') ** alpha),
+                'c':        float(sl.get('c')) / (PartialSafetyFactors.get('f_cf') ** alpha),
+                'phi':      np.degrees(np.arctan(np.tan(np.radians(float(sl.get('phi')))) /
+                                                (PartialSafetyFactors.get('f_phif') ** alpha))),
+                'i':        float(sl.get('i')),
+                'r':        float(sl.get('r')),
+                'Description': sl.get('Description'),
+                'KeepDrained': sl.get('KeepDrained')
+            }
+            for sl in SoilLayers
+        ]
+
     
     def SoilLayerAnalysis(self, SoilLayers, PartialSafetyFactors, Analysis, Analysisspot):
         DesignSoilLayers = []

@@ -115,12 +115,12 @@ class verticalEquilibrium():
             tabcalc.update_idletasks()
             pb['value'] = AnalysisNo
             pb.update() ## update progress bar
-            
-            ExecuteOutput = spooksfile.ExecuteSPOOKS(Analysis,logtxt,tk)
+            sf = spooksfile()
+            ExecuteOutput = sf.ExecuteSPOOKS(Analysis,logtxt,tk)
             
             ReportErrors = ExecuteOutput.get('Errors')
         
-            GetResultsOutput = spooksfile.GetResults(ExecuteOutput)
+            GetResultsOutput = sf.GetResults(ExecuteOutput)
         
         
         #else:

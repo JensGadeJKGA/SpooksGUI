@@ -6,6 +6,9 @@ from SpooksHelperLib.Utils import utils
 from SpooksHelperLib.SoilProfiles import soilprofiles
 
 class spooksfile():
+    def __init__(self):
+        pass
+
     def anchorLevel(Anchorlevel, PrescrbAnchorForce, anchCoeffVars):
         baseArr = [format(anchCoeffVars["iA"],'.2f'), 
                         format(anchCoeffVars["iB"],'.2f'),
@@ -44,6 +47,19 @@ class spooksfile():
         
 
     def GenerateSPOOKSInputFile(self, Analysis):
+        print("GenerateSPOOKSInputFile")
+        print("SlopeBack:")
+        print(Analysis.get('SlopeBack'))
+        print(format(Analysis.get('SlopeBack'),'.2f'))
+        print("\n")
+        print("DesignLoadFront:")
+        print(Analysis.get('DesignLoadFront'))
+        print(format(Analysis.get('DesignLoadFront'),'.2f'))
+        print("\n")
+        print("DesignLoadBack:")
+        print(Analysis.get('DesignLoadBack'))
+        print(format(Analysis.get('DesignLoadBack'),'.2f'))
+        print("\n")
         State = Analysis.get('State')
 
         Geninf = [format(Analysis.get('SlopeFront'),'.2f'), 
@@ -185,7 +201,7 @@ class spooksfile():
         f.close()
     
     def ExecuteSPOOKS(self, Analysis,logtxt,tk):
-    
+        print("ExecuteSPOOKS")
         Output = self.GenerateSPOOKSInputFile(Analysis)
         
         Analysis = Output.get('Analysis')
@@ -209,7 +225,7 @@ class spooksfile():
         
         logtxt.insert(tk.END, SPOOKSOut)
         
-        print(SPOOKSOut) ### Printing output if script run as script
+        #print(SPOOKSOut) ### Printing output if script run as script
 
         #logtxt.insert(tk.END, out) ### Print "out" to log tab in GUI
         
@@ -246,7 +262,7 @@ class spooksfile():
         return ExecuteOutput
     
     # Main function that coordinates the full result extraction and structuring
-    def GetResults(ExecuteOutput):
+    def GetResults(self, ExecuteOutput):
         # Step 1: Parse basic results
         ResultVar = utils.parse_result_variables(ExecuteOutput)
 
