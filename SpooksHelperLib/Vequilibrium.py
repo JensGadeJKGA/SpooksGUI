@@ -94,9 +94,10 @@ class verticalEquilibrium():
     
     def SPOOKSFeeder(input_path,calcno,pb,tabcalc,logtxt,tk):    
         FeederOutput = []
+        g = generators()
         
         
-        GeneratedAnalyses = generators.GenerateAnalyses(input_path)
+        GeneratedAnalyses = g.GenerateAnalyses(input_path)
         
         
         ## Progress bar maximum

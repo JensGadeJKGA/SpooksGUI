@@ -92,9 +92,27 @@ class analysisclass():
     def AddDesignParameters(self,GeneratedAnalyses,LoadComb):
         
         LoadCombinations = utils.GeneratePartialCoefficientDictionary(LoadComb)
+        print(LoadCombinations)
         
         
         for Analysis in GeneratedAnalyses:
+            cc = Analysis.get('ConsequenceClass')
+            lc = Analysis.get('LoadCombination')
+            print(f"ConsequenceClass: {cc}, LoadCombination: {lc}")
+            partial_class = LoadCombinations.get(cc)
+            print(f"Partial class: {partial_class}")
+            if partial_class is not None:
+                PartialSafetyFactors = partial_class.get(partial_class)
+            else:
+                PartialSafetyFactors = None
+            print(f"PartialSafetyFactors: {PartialSafetyFactors}")
+
+            if PartialSafetyFactors is None:
+                raise ValueError(f"PartialSafetyFactors is None for ConsequenceClass={cc} and LoadCombination={lc}")
+
+            # Now call SoilLayerAnalysis safely
+            Analysis['DesignSoilLayersBack'] = self.SoilLayerAnalysis(Analysis.get('SoilLayersBack'), PartialSafetyFactors, Analysis, 'DesignSoilLayersBack')
+
             PartialSafetyFactors = LoadCombinations.get(Analysis.get('ConsequenceClass')).get(Analysis.get('LoadCombination'))
             
             #Soils
@@ -120,7 +138,7 @@ class analysisclass():
             Analysis['PartialSafetyFactors'] = PartialSafetyFactors
     
     def SoilLayerAnalysis(self, SoilLayers, PartialSafetyFactors, Analysis, Analysisspot):
-        DesignSoilLayers = None
+        DesignSoilLayers = []
         Alpha = float(Analysis.get('Alpha'))
         
         for SoilLayer in SoilLayers:

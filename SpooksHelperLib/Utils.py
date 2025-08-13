@@ -107,8 +107,9 @@ class utils:
                     'f_cub':  float(LC.iloc[i, 11]),
                     'f_phib': float(LC.iloc[i, 12])
                 }
-
+                
                 loadcombinations[cc][Loadcombination] = PartialSafetyFactors
+                print(loadcombinations[cc][Loadcombination])
 
         return loadcombinations
 

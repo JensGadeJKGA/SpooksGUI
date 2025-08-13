@@ -32,8 +32,8 @@ import subprocess
 import os
 import tkinter as tk
 import tkinter.scrolledtext as tkst
-import subprocess
 import time
+import sys
 
 from datetime import datetime
 from pathlib import Path
@@ -60,10 +60,10 @@ Version = '3'
 ############### GUI Functions
 
 def OpenSpooks(dev_mode = False, spoof_path = None):
-    
     ################### OPEN WINSPOOKS ###################################
     ######### Check in WinSpooks is running - if not -> Run
     ######### (necessary for license check)
+    print("Program started...")
 
     try:
         res = subprocess.check_output(['tasklist'], text=True).splitlines()
@@ -170,7 +170,7 @@ def Disable():
 
 ## Calculate
 def Calculate():
-    
+    print("calculating...")
     log_usage()
 
 
@@ -386,44 +386,54 @@ enter12 = ttk.Label(tabvers, text = "")
 enter12.grid(column = 1, row = 2)
 label_vershead_vers = ttk.Label(tabvers, text = "Version",font = ("Calibri",12))
 label_vershead_vers.grid(column = 1, row = 3, sticky = 'W')
+label_vers_vers2 = ttk.Label(tabvers, text = "3.0",font = ("Calibri",12))
+label_vershead_vers.grid(column = 1, row = 4, sticky = 'W')
 label_vers_vers2 = ttk.Label(tabvers, text = "2.0",font = ("Calibri",12))
-label_vers_vers2.grid(column = 1, row = 4, sticky = 'W')
+label_vers_vers2.grid(column = 1, row = 5, sticky = 'W')
 label_vers_vers1 = ttk.Label(tabvers, text = "1.0",font = ("Calibri",12))
-label_vers_vers1.grid(column = 1, row = 5, sticky = 'W')
+label_vers_vers1.grid(column = 1, row = 6, sticky = 'W')
 label_vers_vers2 = ttk.Label(tabvers, text = "0.1",font = ("Calibri",12))
-label_vers_vers2.grid(column = 1, row = 6, sticky = 'W')
+label_vers_vers2.grid(column = 1, row = 7, sticky = 'W')
 label_vershead_date = ttk.Label(tabvers, text = "Date",font = ("Calibri",12))
 label_vershead_date.grid(column = 2, row = 3, sticky = 'W')
+label_vers_date1 = ttk.Label(tabvers, text = "??????????",font = ("Calibri",12))
+label_vershead_date.grid(column = 2, row = 4, sticky = 'W')
 label_vers_date1 = ttk.Label(tabvers, text = "22.03.2024",font = ("Calibri",12))
-label_vers_date1.grid(column = 2, row = 4, sticky = 'W')
-label_vers_date1 = ttk.Label(tabvers, text = "12.05.2020",font = ("Calibri",12))
 label_vers_date1.grid(column = 2, row = 5, sticky = 'W')
+label_vers_date1 = ttk.Label(tabvers, text = "12.05.2020",font = ("Calibri",12))
+label_vers_date1.grid(column = 2, row = 6, sticky = 'W')
 label_vers_date2 = ttk.Label(tabvers, text = "10.01.2020",font = ("Calibri",12))
-label_vers_date2.grid(column = 2, row = 6, sticky = 'W')
+label_vers_date2.grid(column = 2, row = 7, sticky = 'W')
 label_vershead_prep = ttk.Label(tabvers, text = "Prepared",font = ("Calibri",12))
 label_vershead_prep.grid(column = 3, row = 3, sticky = 'W')
-label_vers_prep1 = ttk.Label(tabvers, text = "EMBT",font = ("Calibri",12))
+label_vers_prep1 = ttk.Label(tabvers, text = "JKGA",font = ("Calibri",12))
 label_vers_prep1.grid(column = 3, row = 4, sticky = 'W')
 label_vers_prep1 = ttk.Label(tabvers, text = "EMBT",font = ("Calibri",12))
 label_vers_prep1.grid(column = 3, row = 5, sticky = 'W')
+label_vers_prep1 = ttk.Label(tabvers, text = "EMBT",font = ("Calibri",12))
+label_vers_prep1.grid(column = 3, row = 6, sticky = 'W')
 label_vers_prep2 = ttk.Label(tabvers, text = "EMBT",font = ("Calibri",12))
-label_vers_prep2.grid(column = 3, row = 6, sticky = 'W')
+label_vers_prep2.grid(column = 3, row = 7, sticky = 'W')
 label_vershead_check = ttk.Label(tabvers, text = "Checked",font = ("Calibri",12))
 label_vershead_check.grid(column = 4, row = 3, sticky = 'W')
-label_vers_check1 = ttk.Label(tabvers, text = "MLHU",font = ("Calibri",12))
+label_vers_check1 = ttk.Label(tabvers, text = "JKGA",font = ("Calibri",12))
 label_vers_check1.grid(column = 4, row = 4, sticky = 'W')
-label_vers_check1 = ttk.Label(tabvers, text = "EMSS",font = ("Calibri",12))
+label_vers_check1 = ttk.Label(tabvers, text = "MLHU",font = ("Calibri",12))
 label_vers_check1.grid(column = 4, row = 5, sticky = 'W')
+label_vers_check1 = ttk.Label(tabvers, text = "EMSS",font = ("Calibri",12))
+label_vers_check1.grid(column = 4, row = 6, sticky = 'W')
 label_vers_check2 = ttk.Label(tabvers, text = "EMSS",font = ("Calibri",12))
-label_vers_check2.grid(column = 4, row = 6, sticky = 'W')
+label_vers_check2.grid(column = 4, row = 7, sticky = 'W')
 label_vershead_desc = ttk.Label(tabvers, text = "Description",font = ("Calibri",12))
 label_vershead_desc.grid(column = 5, row = 3, sticky = 'W')
-label_vers_desc1 = ttk.Label(tabvers, text = "Added sheet pile wall - Add on",font = ("Calibri",12))
+label_vers_desc1 = ttk.Label(tabvers, text = "Completely refactored source code",font = ("Calibri",12))
 label_vers_desc1.grid(column = 5, row = 4, sticky = 'W')
-label_vers_desc1 = ttk.Label(tabvers, text = "Report generation and vertical equilibrium added",font = ("Calibri",12))
+label_vers_desc1 = ttk.Label(tabvers, text = "Added sheet pile wall - Add on",font = ("Calibri",12))
 label_vers_desc1.grid(column = 5, row = 5, sticky = 'W')
+label_vers_desc1 = ttk.Label(tabvers, text = "Report generation and vertical equilibrium added",font = ("Calibri",12))
+label_vers_desc1.grid(column = 5, row = 6, sticky = 'W')
 label_vers_desc2 = ttk.Label(tabvers, text = "Test version",font = ("Calibri",12))
-label_vers_desc2.grid(column = 5, row = 6, sticky = 'W')
+label_vers_desc2.grid(column = 5, row = 7, sticky = 'W')
 ####################### End of log tab #############################
 
 tab_parent.pack(expand=1, fill='both')
