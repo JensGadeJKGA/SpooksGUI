@@ -21,7 +21,6 @@ class export:
 
         for analysis in feeder_output:
             result = analysis.get('GetResultsOutput', {})
-            print(result)
 
             addon_used = result.get('Analysis', {}).get('SheetPileAddOnInput', {}).get('UseAddOn') == 'Yes'
             addon_results = eh.get_sheet_pile_addon_results(result) if addon_used else {
@@ -31,8 +30,8 @@ class export:
                 'RURLevel_max': 'N/A',
                 'RotCap': 'N/A'
             }
-
-            vertical_eq = verticalEquilibrium.VerticalEquilibrium(result)
+            ve = verticalEquilibrium()
+            vertical_eq = ve.VerticalEquilibrium(result)
             sum_tan_force = vertical_eq.get('SumTanForce', 0)
 
             analysis_no = result['Analysis'].get('AnalysisNo', 'N/A')

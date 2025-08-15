@@ -15,13 +15,13 @@ class generatePDF:
         # === Input Parsing ===
         PDFdict, PlotResults, Analysis = ph.generatePDFdict(VerticalEquilibriumOutput)
         ToeLevel, SumTanForce, WallMass, WeightWallTotal = ph.generateToeLevel(
-            VerticalEquilibriumOutput, PDFdict['Analysis'], PDFdict['SoilLayersFront']
+            VerticalEquilibriumOutput, PDFdict['Analysis'], PDFdict['SoilLayersFront'], PDFdict['zT']
         )
         PlotLevels, e1, e2, Moment, ShearForce, DW, ENet, JU = ph.extractPlotResults(PlotResults)
-        Sheetpiledict, Sheetpile, u_rel, control_Rot, u_rel_lvl = ph.extractSheetPileInput(Analysis)
+        Sheetpiledict, Sheetpile, u_rel, control_Rot, u_rel_lvl = ph.extractSheetPileInput(Analysis, SheetPileAddOnResults)
 
         # === PDF Setup ===
-        pdf, col_width, th, epw = ph.instantiatePDF(PDFdict['Warnings'])
+        pdf, col_width, th, epw = ph.instantiatePDF(PDFdict)
 
         # === SECTION 1: General Information ===
         pdf.set_font("Courier", size=15)
@@ -59,14 +59,14 @@ class generatePDF:
         pdf = ph.fillPDFext('zT', PDFdict, pdf, col_width, th, 'm')
 
         # === Anchors ===
-        if PDFdict['Anchorlevel'] is not None:
-            pdf = ph.fillPDFext('Anchorlevel', PDFdict, pdf, col_width, th, 'm', 2, 'Anchor level, zA')
+        if PDFdict['AnchorLevel'] is not None:
+            pdf = ph.fillPDFext('AnchorLevel', PDFdict, pdf, col_width, th, 'm', 2, 'Anchor level, zA')
             pdf = ph.fillPDFext('AnchorInclination', PDFdict, pdf, col_width, th, 'deg.', 2, 'Anchor inclination:')
 
-            if PDFdict['PrescrAnchorForce'] != 0.00:
-                pdf = ph.fillPDFext('PrescrAnchorForce', PDFdict, pdf, col_width, th, 'kN/m.', 2, 'Prescr. anchor force:')
+            if PDFdict['PrescrbAnchorForce'] != 0.00:
+                pdf = ph.fillPDFext('PrescrbAnchorForce', PDFdict, pdf, col_width, th, 'kN/m.', 2, 'Prescrb. anchor force:')
             else:
-                pdf.cell(col_width[0], 2 * th, str('Prescr. anchor force:'), border=1)
+                pdf.cell(col_width[0], 2 * th, str('Prescrb. anchor force:'), border=1)
                 pdf.cell(col_width[1], 2 * th, str('N/A'), border=1)
                 pdf.cell(col_width[0], 2 * th, str('kN/m'), border=1)
                 pdf.ln(2 * th)

@@ -1,5 +1,6 @@
 from fpdf import FPDF
 
+
 class PDFhelper:
     def generatePDFdict(VerticalEquilibriumOutput):
         GetResultsOutput = VerticalEquilibriumOutput.get('GetResultsOutput')
@@ -65,7 +66,6 @@ class PDFhelper:
                 SoilLevelsFront.append(SoilLayer.get('TopLayer'))
             GroundLevelFront = max(SoilLevelsFront)
             ToeLevel = GroundLevelFront - 0.1
-        print(ToeLevel)
 
         SumTanForce = VerticalEquilibriumOutput.get('SumTanForce')
         WallMass = Analysis.get('WallMass') 
@@ -117,6 +117,8 @@ class PDFhelper:
         
             # Page footer
             def footer(self):
+                from GUI_SPOOKSFunctions_2_0 import Version
+                
                 # Position at 1.5 cm from bottom
                 self.set_y(-15)
                 self.set_font('Courier', '', 7)
