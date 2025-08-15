@@ -55,7 +55,7 @@ class utils:
 
 
     def TemporaryWorkingDirectory():
-        user = "MLHU"
+        user = "JKGA"
         
         ## output path
         TemporaryPath = os.path.join(r'C:\Users', user)
@@ -248,16 +248,17 @@ class utils:
     def AddSpaces(items):
         returnitem = ""
         for item in items:
-            if len(item) == 4:
+            space = '    ' # 4 spaces default
+            if len(str(item)) == 4:
                 space = '      ' # 6 spaces
-            if len(item) == 5:
+            if len(str(item)) == 5:
                 space = '     '  # 5 spaces
-            if len(item) == 6:
+            if len(str(item)) == 6:
                 space = '    '   # 4 spaces
-            returnitem += (space+item)
+            returnitem += (space+str(item))
         return returnitem
 
-    def linesplitter(lines, check, checkTwo=None, indice=0):
+    def linesplitter(self, lines, check, checkTwo=None, indice=0):
         for line in lines:
             if check in line or (checkTwo and checkTwo in line):
                 parts = line.split()
@@ -285,7 +286,7 @@ class utils:
         return self.linesplitterMult(ExecuteOutput.get('SPOOKSOutput'), checkArr, checkTwoArr, iArr)
 
     # Reads the SPOOKS plot file (usually a text file) and returns a list of its lines
-    def read_plot_file_lines(ExecuteOutput):
+    def read_plot_file_lines(self,ExecuteOutput):
         with open(ExecuteOutput.get('SPOOKSPlotFile'), 'r') as f:
             return f.readlines()
 

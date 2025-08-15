@@ -60,33 +60,23 @@ class generators():
         
         return SheetPileAddOnInput
     
-    def GenerateSoilProfiles(self,Stratification):
+    def GenerateSoilProfiles(self, Stratification):
 
-        SoilProfiles = {'SP1': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                        'SP2': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                        'SP3': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                        'SP4': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                        'SP5': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                        'SP6': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                        'SP7': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                        'SP8': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                        'SP9': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}},
-                        'SP10': {'Back': {'Slope': None,'Layers': []}, 'Front': {'Slope': None,'Layers': []}}}
+        # Initialize the SoilProfiles dictionary
+        SoilProfiles = {f'SP{i+1}': {'Back': {'Slope': None,'Layers': []}, 
+                                    'Front': {'Slope': None,'Layers': []}} for i in range(10)}
 
-
-        
-        #front soils
-        for i in range(10):
-            sp = "SP"+str(i+1)
-            soilprofile = soilprofiles.soilprofiles(sp, Stratification, SoilProfiles, [29*i,5], i)
-            soilprofiles.AppendToSoilProfiles(*soilprofile)
-
-        #back soils    
-        for i in range(10):
-            soilprofile = soilprofiles.soilprofiles(sp, Stratification, SoilProfiles, [29*i,2], i)
-            soilprofiles.AppendToSoilProfiles(*soilprofile)
-        
+        # Loop over front and back soils
+        for side, col_index in [('Front', 5), ('Back', 2)]:
+            for i in range(10):
+                sp = f"SP{i+1}"
+                # Get all info needed for AppendToSoilProfiles
+                soilprofile_args = soilprofiles.soilprofiles(sp, Stratification, SoilProfiles, [29*i, col_index], i, side)
+                # Append layers
+                soilprofiles.AppendToSoilProfiles(*soilprofile_args)
+                
         return SoilProfiles
+
     
    
     def GenerateAnalyses(self,input_path):

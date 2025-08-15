@@ -8,27 +8,36 @@ import numpy as np
 
 ###### This function normalizes the soil profile generation
 class soilprofiles():
-    def soilprofiles(name, Stratification, SoilProfiles, ilocrange, i):
-        #### Soil profile X
-        SoilProfile = name
-        ## Soil stratigraphy front
-        if pd.isnull(Stratification.iloc[ilocrange[0],ilocrange[1]]) == True: ## if no value entered in slope -> value is 0
-            Stratification.iloc[ilocrange[0],ilocrange[1]] = 0.00
-            
-        SoilProfiles[SoilProfile]['Front']['Slope'] = utils.safe_float(Stratification.iloc[ilocrange[0], ilocrange[1]])
+    def soilprofiles(name, Stratification, SoilProfiles, ilocrange, i, side):
 
-        ## Start of front stratigraphy layers soil profile 1
-        index_start = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 'Front']
-        index_start = index_start[i]
-        ## end of front stratigraphy layers soil profile 1
-        index_end = [k for k, j in enumerate(Stratification.iloc[:,1]) if j == None and k > index_start]
-        if not index_end:
-            index_end = [k for k, j in enumerate(Stratification.iloc[:,0]) if j == 10 and k > index_start]
-        else:
-            index_end = index_end[0]
-            
-        return_arr = [SoilProfile,'Front',index_start, index_end, SoilProfiles,Stratification]
-        return return_arr
+        SoilProfile = name
+
+        # If slope cell is empty, set to 0.00
+        if pd.isnull(Stratification.iloc[ilocrange[0], ilocrange[1]]):
+            Stratification.iloc[ilocrange[0], ilocrange[1]] = 0.00
+
+        # Save slope to the correct side
+        SoilProfiles[SoilProfile][side]['Slope'] = utils.safe_float(
+            Stratification.iloc[ilocrange[0], ilocrange[1]]
+        )
+
+        # Find start index for this side's layers
+        index_start_list = [k for k, j in enumerate(Stratification.iloc[:, 0]) if j == side]
+        if i >= len(index_start_list):
+            raise IndexError(f"No {side} section found for profile {SoilProfile} at index {i}")
+        index_start = index_start_list[i]
+
+        # Find end index for layers
+        index_end_list = [k for k, j in enumerate(Stratification.iloc[:, 1])
+                        if j is None and k > index_start]
+        if not index_end_list:
+            index_end_list = [k for k, j in enumerate(Stratification.iloc[:, 0])
+                            if j == 10 and k > index_start]
+        index_end = index_end_list[0] if index_end_list else len(Stratification)
+        
+        return SoilProfile, side, index_start, index_end, SoilProfiles, Stratification
+        
+
 
     def AppendToSoilProfiles(SoilProfile,Side,index_start, index_end, SoilProfiles,Stratification):
             

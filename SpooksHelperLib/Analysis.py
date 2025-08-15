@@ -37,7 +37,6 @@ class analysisclass():
 
     
     def AddSoilToAnalysis(self,GeneratedAnalyses,SoilProfiles):
-        
         ## Loop through all generated analyses and append stratigraphy input
         for Analysis in GeneratedAnalyses:
             
@@ -48,9 +47,11 @@ class analysisclass():
             
             ## Append slope back
             Analysis['SlopeBack'] = SP.get('Back').get('Slope')
+            print("slopeBack: ", Analysis['SlopeBack'])
             
             ## Append slope front
             Analysis['SlopeFront'] = SP.get('Front').get('Slope')
+            print("SlopeFront: ", Analysis['SlopeFront'],"\n")
             
             ## Append soil profile properties (back)
             for SoilLayer in SP.get('Back').get('Layers'):
@@ -61,6 +62,10 @@ class analysisclass():
             for SoilLayer in SP.get('Front').get('Layers'):
             
                     Analysis.get('SoilLayersFront').append(SoilLayer)
+            
+        return GeneratedAnalyses
+        
+
         
 
 
@@ -86,7 +91,8 @@ class analysisclass():
                 for Pressure in APProfile.get('ez'):
                 
                         Analysis.get('AddPress_ez').append(Pressure)
-                        
+        
+        return GeneratedAnalyses
 
 
     def AddDesignParameters(self, GeneratedAnalyses, LoadComb):
@@ -145,6 +151,8 @@ class analysisclass():
 
             # Store the partial safety factors for reference
             analysis['PartialSafetyFactors'] = PartialSafetyFactors
+        
+        return GeneratedAnalyses
 
 
 

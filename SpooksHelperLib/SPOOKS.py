@@ -9,7 +9,7 @@ class spooksfile():
     def __init__(self):
         pass
 
-    def anchorLevel(Anchorlevel, PrescrbAnchorForce, anchCoeffVars):
+    def anchorLevel(self, Anchorlevel, PrescrbAnchorForce, anchCoeffVars):
         baseArr = [format(anchCoeffVars["iA"],'.2f'), 
                         format(anchCoeffVars["iB"],'.2f'),
                         format(anchCoeffVars["iC"],'.2f'), 
@@ -47,21 +47,8 @@ class spooksfile():
         
 
     def GenerateSPOOKSInputFile(self, Analysis):
-        print("GenerateSPOOKSInputFile")
-        print("SlopeBack:")
-        print(Analysis.get('SlopeBack'))
-        print(format(Analysis.get('SlopeBack'),'.2f'))
-        print("\n")
-        print("DesignLoadFront:")
-        print(Analysis.get('DesignLoadFront'))
-        print(format(Analysis.get('DesignLoadFront'),'.2f'))
-        print("\n")
-        print("DesignLoadBack:")
-        print(Analysis.get('DesignLoadBack'))
-        print(format(Analysis.get('DesignLoadBack'),'.2f'))
-        print("\n")
         State = Analysis.get('State')
-
+        print(Analysis)
         Geninf = [format(Analysis.get('SlopeFront'),'.2f'), 
                 format(Analysis.get('SlopeBack'),'.2f'),
                 format(Analysis.get('DesignLoadFront'),'.2f'), 
@@ -187,7 +174,7 @@ class spooksfile():
         
         return Output
     
-    def LogFile(InputFileDir,AnalysisNo,SPOOKSOut):
+    def LogFile(self, InputFileDir,AnalysisNo,SPOOKSOut):
         logfile = os.path.join(InputFileDir, r'log_file.txt')
         
         if AnalysisNo == 0:  ### Creates (or overwrites existing) log file
@@ -201,9 +188,8 @@ class spooksfile():
         f.close()
     
     def ExecuteSPOOKS(self, Analysis,logtxt,tk):
-        print("ExecuteSPOOKS")
-        Output = self.GenerateSPOOKSInputFile(Analysis)
         
+        Output = self.GenerateSPOOKSInputFile(Analysis)
         Analysis = Output.get('Analysis')
         AnalysisNo = Analysis.get('AnalysisNo')
         InputFile = Output.get('InputFile')
@@ -263,11 +249,12 @@ class spooksfile():
     
     # Main function that coordinates the full result extraction and structuring
     def GetResults(self, ExecuteOutput):
+        u = utils()
         # Step 1: Parse basic results
-        ResultVar = utils.parse_result_variables(ExecuteOutput)
+        ResultVar = u.parse_result_variables(ExecuteOutput)
 
         # Step 2: Read plot file
-        lines = utils.read_plot_file_lines(ExecuteOutput)
+        lines = u.read_plot_file_lines(ExecuteOutput)
 
         # Step 3: Parse earth pressure block
         (
