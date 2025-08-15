@@ -8,10 +8,13 @@ from SpooksHelperLib.Utils import utils
 from SpooksHelperLib.SPOOKS import spooksfile
 
 class verticalEquilibrium():
+    def __init__(self):
+        pass
+
     def soilLayer(self, soillayer):
         retarr = []
         for soil in soillayer:
-            retarr.append(soil.get('Toplayer'))
+            retarr.append(soil.get('TopLayer'))
         groundlevel = max(retarr)
         
         return(retarr,groundlevel)
@@ -22,7 +25,7 @@ class verticalEquilibrium():
             #DesignSoilLayers (str) which soillayer 
             #State (str): 'drained' or 'undrained'
             #i (int): Current index in loop
-    def compute_tangential_force(GetResultsOutput, DesignSoilLayers, State, i):
+    def compute_tangential_force(self, GetResultsOutput, DesignSoilLayers, State, i):
         tan_force = 0
         PlotLevels = GetResultsOutput.get('PlotResults').get('PlotLevels')
         e = ""
@@ -33,7 +36,7 @@ class verticalEquilibrium():
             e = GetResultsOutput.get('PlotResults').get('e2')
         else: e = "Unknown Error"
 
-        (SoilLevels, GroundLevel) = SoilLayer(GetResultsOutput.get('Analysis').get(DesignSoilLayers))
+        (SoilLevels, GroundLevel) = self.soilLayer(GetResultsOutput.get('Analysis').get(DesignSoilLayers))
 
         if GetResultsOutput.get('PlotResults').get('PlotLevels')[i+1] < GroundLevel:
             force = abs(np.trapz(e[i:i+2], PlotLevels[i:i+2]))  # Area under pressure curve
@@ -44,7 +47,7 @@ class verticalEquilibrium():
                 index = [j for j, k in enumerate(SoilLevels) if float(k) > PlotLevels[i+1]]
                 index = index[-1]  # Closest soil layer above
 
-            SoilLayer = DesignSoilLayers[index]
+            SoilLayer = GetResultsOutput.get('Analysis').get(DesignSoilLayers)[index]
 
             if State.lower() == 'drained' or SoilLayer.get('KeepDrained') == 'Yes':
                 tan_delta = float(SoilLayer.get('r')) * np.tan(np.radians(SoilLayer.get('phi')))
@@ -70,12 +73,12 @@ class verticalEquilibrium():
         for i in range(len(GetResultsOutput.get('PlotResults').get('e1'))-1):
         
             ##### back side of wall (active)
-            tan_force_back = self.compute_tangential_force('DesignSoilLayersBack', GetResultsOutput.get('Analysis').get('State'), i)
+            tan_force_back = self.compute_tangential_force(GetResultsOutput,'DesignSoilLayersBack', GetResultsOutput.get('Analysis').get('State'), i)
                 ## Sum of tangential forces back    
             sum_tanforce_back = sum_tanforce_back + abs(tan_force_back)
             
             ##### Front side of wall (passive)
-            tan_force_front = self.compute_tangential_force('DesignSoilLayersFront', GetResultsOutput.get('Analysis').get('State'), i)
+            tan_force_front = self.compute_tangential_force(GetResultsOutput,'DesignSoilLayersFront', GetResultsOutput.get('Analysis').get('State'), i)
                 ## Sum of tangential forces front
             sum_tanforce_front = sum_tanforce_front + abs(tan_force_front)
 

@@ -47,11 +47,9 @@ class analysisclass():
             
             ## Append slope back
             Analysis['SlopeBack'] = SP.get('Back').get('Slope')
-            print("slopeBack: ", Analysis['SlopeBack'])
             
             ## Append slope front
             Analysis['SlopeFront'] = SP.get('Front').get('Slope')
-            print("SlopeFront: ", Analysis['SlopeFront'],"\n")
             
             ## Append soil profile properties (back)
             for SoilLayer in SP.get('Back').get('Layers'):

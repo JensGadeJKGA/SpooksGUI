@@ -61,21 +61,41 @@ class generators():
         return SheetPileAddOnInput
     
     def GenerateSoilProfiles(self, Stratification):
-
         # Initialize the SoilProfiles dictionary
-        SoilProfiles = {f'SP{i+1}': {'Back': {'Slope': None,'Layers': []}, 
-                                    'Front': {'Slope': None,'Layers': []}} for i in range(10)}
+        SoilProfiles = {
+            f'SP{i+1}': {
+                'Back': {'Slope': None, 'Layers': []},
+                'Front': {'Slope': None, 'Layers': []}
+            } for i in range(10)
+        }
 
         # Loop over front and back soils
         for side, col_index in [('Front', 5), ('Back', 2)]:
+            row_offset = 0  # running row index for slope cells
             for i in range(10):
                 sp = f"SP{i+1}"
+
                 # Get all info needed for AppendToSoilProfiles
-                soilprofile_args = soilprofiles.soilprofiles(sp, Stratification, SoilProfiles, [29*i, col_index], i, side)
+                soilprofile_args = soilprofiles.soilprofiles(
+                    sp,
+                    Stratification,
+                    SoilProfiles,
+                    [row_offset, col_index],  # slope cell position
+                    i,
+                    side
+                )
+
                 # Append layers
                 soilprofiles.AppendToSoilProfiles(*soilprofile_args)
-                
+
+                # Increment row offset according to profile number
+                if i < 3:  # SP1–SP3
+                    row_offset += 28
+                else:      # SP4–SP10
+                    row_offset += 29
+
         return SoilProfiles
+
 
     
    
@@ -102,7 +122,6 @@ class generators():
             ### Ranges of analyses
             RangeOfAnalyses = analysisclass.AnalysesRange(Analyses)
             
-            print("Range of analyses: ",RangeOfAnalyses)
             MinAnalysis = RangeOfAnalyses.get('MinAnalysis')
             MaxAnalysis = RangeOfAnalyses.get('MaxAnalysis')
             u = utils()

@@ -20,8 +20,8 @@ class generateReport:
         print('Generating report...')
 
         ## Vertical equilibrium
-        
-        VerticalEquilibriumOutput = verticalEquilibrium.VerticalEquilibrium(GetResultsOutput)    
+        ve = verticalEquilibrium()
+        VerticalEquilibriumOutput = ve.VerticalEquilibrium(GetResultsOutput)    
 
         if GetResultsOutput['Analysis']['SheetPileAddOnInput']['UseAddOn'] == 'Yes':
         # try:
@@ -40,9 +40,10 @@ class generateReport:
                                     'RUR': 'N/A',
                                     'RURLevel': 'N/A',
                                     'RotCap': 'N/A'}
-        
-        TempReportFrontPath = reportFront.ReportFront(VerticalEquilibriumOutput,OutputDirList,Version)
-        TemporaryPathResults = generatePDF.PDFGenerator(VerticalEquilibriumOutput, SheetPileAddOnResults, Version)
+        rf = reportFront()
+        gp = generatePDF()
+        TempReportFrontPath = rf.ReportFront(VerticalEquilibriumOutput,OutputDirList,Version)
+        TemporaryPathResults = gp.PDFGenerator(VerticalEquilibriumOutput, SheetPileAddOnResults, Version)
         
         ## Temporary file dir
         TemporaryPathReport = utils.TemporaryWorkingDirectory()

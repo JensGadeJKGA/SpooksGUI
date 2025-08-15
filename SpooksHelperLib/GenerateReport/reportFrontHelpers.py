@@ -18,7 +18,7 @@ class reportFrontHelpers:
             'AnalysisNo': Analysis.get('AnalysisNo'),
             'State': Analysis.get('State'),
             'SoilLayersFront': Analysis.get('SoilLayersFront'),
-            'SoilLayersFront': Analysis.get('SoilLayersBack'),
+            'SoilLayersBack': Analysis.get('SoilLayersBack'),
             'PlotResults': PlotResults,
             'PlotLevels': PlotResults.get('PlotLevels'),
             'e1': PlotResults.get('e1'),
@@ -45,39 +45,23 @@ class reportFrontHelpers:
         }
         return reportDict
 
-    def TemporaryWorkingDirectory():
-        
-
-        user = "MLHU"
-        
-        ## output path
-        TemporaryPath = os.path.join(r'C:\Users', user)
-        TemporaryPath = os.path.join(TemporaryPath, r'AppData\Local\Temp\2')
-        
-        if not os.path.exists(TemporaryPath): ## if directory does not exist -> create it
-            os.makedirs(TemporaryPath)
-            
-        return TemporaryPath
-
-    def maxsoillayer(SoilLayers):
+    def maxsoillayer(self, SoilLayers):
         SoilLevels = []
         for SoilLayer in SoilLayers:
             SoilLevels.append(SoilLayer.get('TopLayer'))
         GroundLevel = max(SoilLevels)
         return GroundLevel
     
-    def toelevel(Toelevel, GroundLevelFront):
-        if ToeLevel == 'N/A':
-            ToeLevel = GroundLevelFront - 0.1
-        print(ToeLevel)
-        return ToeLevel
+    def toelevel(self, Toelevel, GroundLevelFront):
+        if Toelevel == 'N/A':
+            Toelevel = GroundLevelFront - 0.1
+        return Toelevel
 
-    def weightwalltotal(Toelevel, zT, wallweight):
+    def weightwalltotal(self, Toelevel, zT, wallweight):
         try:
             WeightWallTotal = wallweight * (zT-Toelevel)
         except TypeError:
             WeightWallTotal = 'N/A'
-        print(WeightWallTotal)
         return WeightWallTotal
 
 #INPUT PROCESSING

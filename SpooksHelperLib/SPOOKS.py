@@ -48,7 +48,6 @@ class spooksfile():
 
     def GenerateSPOOKSInputFile(self, Analysis):
         State = Analysis.get('State')
-        print(Analysis)
         Geninf = [format(Analysis.get('SlopeFront'),'.2f'), 
                 format(Analysis.get('SlopeBack'),'.2f'),
                 format(Analysis.get('DesignLoadFront'),'.2f'), 

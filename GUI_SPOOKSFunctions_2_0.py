@@ -194,12 +194,12 @@ def Calculate():
         stat.configure(text = "Calculation completed")
         tabcalc.update_idletasks()
         
-        
+        gen = generateReport()
         ##### Generating reports
         if checkreport.get() == 1:
             
             
-            generateReport.ReportsMerger(FeederOutput,OutputDirList,Version,stat,tabcalc,pb,calcno)
+            gen.ReportsMerger(FeederOutput,OutputDirList,Version,stat,tabcalc,pb,calcno)
             
             stat.configure(text = "Reports generated")
             tabcalc.update_idletasks()

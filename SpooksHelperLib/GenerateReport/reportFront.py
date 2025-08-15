@@ -1,19 +1,22 @@
+import matplotlib
+matplotlib.use('PDF')
 import matplotlib.pyplot as plt
 import numpy as np
 import os
 
 from SpooksHelperLib.GenerateReport.reportFrontHelpers import reportFrontHelpers as rfh
+from SpooksHelperLib.Utils import utils
 
 class reportFront:
     def ReportFront(self, VerticalEquilibriumOutput, OutputDirList, Version):
         print("Generating report front...")
-
+        rfhelper = rfh()
         # Generate report dictionary ---
         reportDict = rfh.generateReportDict(VerticalEquilibriumOutput, OutputDirList)
 
         # Get geometry values ---
-        GroundLevelBack, GroundLevelFront = rfh.get_ground_levels(reportDict)
-        ToeLevel, WeightWallTotal = rfh.get_toe_and_wall_weight(
+        GroundLevelBack, GroundLevelFront = rfhelper.get_ground_levels(reportDict)
+        ToeLevel, WeightWallTotal = rfhelper.get_toe_and_wall_weight(
             VerticalEquilibriumOutput['GetResultsOutput']['Results'],
             GroundLevelFront,
             reportDict['zT'],
@@ -81,8 +84,8 @@ class reportFront:
         ax.legend(loc='upper right')
 
         # Plot soil layers front and back ---
-        rfh.plot_soil_layers(ax, reportDict['SoilLayersBack'], grnextent_back, ToeLevel, reportDict['State'], side='back')
-        rfh.plot_soil_layers(ax, reportDict['SoilLayersFront'], grnextent_front, ToeLevel, reportDict['State'], side='front')
+        rfhelper.plot_soil_layers(ax, reportDict['SoilLayersBack'], grnextent_back, ToeLevel, reportDict['State'], side='back')
+        rfhelper.plot_soil_layers(ax, reportDict['SoilLayersFront'], grnextent_front, ToeLevel, reportDict['State'], side='front')
 
         # Loads ---
         ax.text(
@@ -122,7 +125,7 @@ class reportFront:
         ax.text(xmax, ymin, 'COWI', fontsize=20, fontname='Century Schoolbook', color='orangered', ha='right', va='bottom')
 
         # Save figure ---
-        temp_path = os.path.join(rfh.TemporaryWorkingDirectory(), 'ReportFront.pdf')
+        temp_path = os.path.join(utils.TemporaryWorkingDirectory(), 'ReportFront.pdf')
         plt.savefig(temp_path, dpi='figure', facecolor='w', edgecolor='w',
                     orientation='portrait', format='pdf', transparent=False,
                     bbox_inches=None, pad_inches=0.05)
