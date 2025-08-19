@@ -100,14 +100,16 @@ class generators():
     
    
     def GenerateAnalyses(self,input_path):
+        print("GenerateAnalyses...")
         u = utils()
         ## Importing Excel file
         ImportData = utils.ImportExcel(input_path)
+        print("finished importexcel")
         Analyses = ImportData.get('Analyses')
 
         ## Check if input file version matches GUI version
-        InputFileStatus = u.InputFileIDChecker(ImportData.get('InputFileID'))
-
+        InputFileStatus = utils.InputFileIDChecker(ImportData.get('InputFileID'))
+        print("finished input id checker...")
         if InputFileStatus == 'OK':
             print("OK")
 
@@ -124,7 +126,6 @@ class generators():
             
             MinAnalysis = RangeOfAnalyses.get('MinAnalysis')
             MaxAnalysis = RangeOfAnalyses.get('MaxAnalysis')
-            u = utils()
 
             ### Defining correct number of decimals for integers and floating numbers
             for Analysis in range(MinAnalysis, MaxAnalysis):

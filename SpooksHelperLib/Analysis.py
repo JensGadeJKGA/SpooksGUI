@@ -10,6 +10,7 @@ class analysisclass():
          pass
     
     def AnalysesRange(Analyses):
+        print("Analysesrange...")
         null = []
         for i in range(15):
             if i != 11:
@@ -37,6 +38,7 @@ class analysisclass():
 
     
     def AddSoilToAnalysis(self,GeneratedAnalyses,SoilProfiles):
+        print("Addsoil...")
         ## Loop through all generated analyses and append stratigraphy input
         for Analysis in GeneratedAnalyses:
             
@@ -68,6 +70,7 @@ class analysisclass():
 
 
     def AddPressureToAnalysis(self,GeneratedAnalyses,AdditionalPressures):
+        print("Addpress...")
         
         ## Loop through all generated analyses and append stratigraphy input
         for Analysis in GeneratedAnalyses:
@@ -94,6 +97,7 @@ class analysisclass():
 
 
     def AddDesignParameters(self, GeneratedAnalyses, LoadComb):
+        print("AddDesign...")
         LoadCombinations = {'CC2': {},
                             'CC3': {}}
         LoadCombinatione = utils.PartialSafetyFactors(LoadComb, LoadCombinations)

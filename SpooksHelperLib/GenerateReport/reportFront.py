@@ -79,7 +79,7 @@ class reportFront:
         # Titles and axis ---
         ax.set_ylabel('Level [m]')
         ax.set_title(f"{reportDict['Project']}, {reportDict['Subject']}, Calc. no. {reportDict['AnalysisNo']}")
-        ax.set_ylim(ymax, ymin)
+        ax.set_ylim(ymin, ymax)
         ax.set_xlim(xmin, xmax)
         ax.legend(loc='upper right')
 

@@ -10,6 +10,7 @@ class export:
         pass
 
     def ExportResultsAsTxt(feeder_output, output_dir_list):
+        print("Exporting as TxT")
         use_addon = feeder_output[0].get('GetResultsOutput', {}).get('Analysis', {}).get('SheetPileAddOnInput', {}).get('UseAddOn') == "Yes"
         base_headers = ['Analysis No.', 'Subject', 'Soil Profile', 'State', 'Load Combination', 'AnchorLevel',
                         'AnchorForce', 'Moment at Anchor Level', 'Level of Max. Moment', 'Max. Moment',
@@ -78,6 +79,7 @@ class export:
 
 
     def ExportEarthPressureResultsAsTxt(FeederOutput, OutputDirList):
+        print("Exporting Earth pressure as TXT")
         
         ## Temporary file dir
         #TemporaryFile = TemporaryWorkingDirectory()

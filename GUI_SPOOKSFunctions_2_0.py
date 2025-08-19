@@ -25,6 +25,7 @@ from SpooksHelperLib.GenerateReport.generateReport import generateReport
 from SpooksHelperLib.Export.export import export
 from SpooksHelperLib.plot import plot
 from SpooksHelperLib.SPWplugin import log_usage
+from SpooksHelperLib.openSpooks import OpenSpooks
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -42,70 +43,22 @@ from tkinter import filedialog
 
 
 ################ Version ##################
-
 Version = '3'
 
 ################ Input file ID ############
-
-
-
-
-############### IMPORT SHEET PILE WALL PLUG IN ###################
-
-
+InputFileIDGUI = 'A3'
 
 ################### FUNCTIONS ####################################
-        
+
 
 ############### GUI Functions
-
-def OpenSpooks(dev_mode = False, spoof_path = None):
-    ################### OPEN WINSPOOKS ###################################
-    ######### Check in WinSpooks is running - if not -> Run
-    ######### (necessary for license check)
-    print("Program started...")
-
-    try:
-        res = subprocess.check_output(['tasklist'], text=True).splitlines()
-    except Exception as e:
-        print("Error checking tasklist:", e)
-        return
-
-    is_running = any('WinSpooks.exe' in line for line in res)
-
-    if not is_running:
-        # Determine the path (real or spoofed)
-        if dev_mode:
-            spooks_path = Path(spoof_path) if spoof_path else Path("C:/FakeProgramFiles/WinSpooks/WinSpooks.exe")
-            print(f"Dev mode: Would launch {spooks_path}")
-            return  # Skip launching in dev mode
-        else:
-            spooks_path = Path("C:/Program Files (x86)/WinSpooks/WinSpooks.exe")
-            if spooks_path.exists():
-                subprocess.Popen([str(spooks_path)])
-                time.sleep(0.5)
-            else:
-                print(f"WinSpooks.exe not found at {spooks_path}")
-    
-    # Optional cleanup (not necessary in Python, but fine)
-    res = None
-    
-    
-
-
 ################### 1. OPEN WINSPOOKS ###################################
 ######### Check in WinSpooks is running - if not -> Run
 ######### (necessary for license check)
 
-
-OpenSpooks()
     
 
 ################# 2. STARTING UP GUI INTERFACE #######################
-
-
-
-
 window = tk.Tk()
 window.minsize(1300,600) ## Initial GUI size
 window.title("WinSPOOKS Plug-in")
@@ -294,7 +247,9 @@ label_outputdir.grid(column = 1, row = 13, sticky = 'E')
 ## directory path
 label_dir = ttk.Label(tabcalc, text = "No directory",font = ("Calibri",11), foreground = 'grey')
 label_dir.grid(column = 2, row = 13, sticky = 'W')
-
+## Open Spooks Button
+button_spooks = ttk.Button(tabcalc, text="Open Spooks", command = OpenSpooks, state='enabled')
+button_spooks.grid(column = 6, row = 13, sticky = 'E')
 ## Browse button
 button_output = ttk.Button(tabcalc, text = "Browse", command = OutputDialog, state='disabled')
 button_output.grid(column =0, row = 13, sticky = 'E')

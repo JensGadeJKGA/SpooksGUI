@@ -187,6 +187,7 @@ class spooksfile():
         f.close()
     
     def ExecuteSPOOKS(self, Analysis,logtxt,tk):
+        print("ExecuteSpooks...")
         
         Output = self.GenerateSPOOKSInputFile(Analysis)
         Analysis = Output.get('Analysis')
@@ -248,6 +249,7 @@ class spooksfile():
     
     # Main function that coordinates the full result extraction and structuring
     def GetResults(self, ExecuteOutput):
+        print("Getting results...")
         u = utils()
         # Step 1: Parse basic results
         ResultVar = u.parse_result_variables(ExecuteOutput)

@@ -1,6 +1,7 @@
 import os
 from SpooksHelperLib.GenerateReport.PDFhelper import PDFhelper as ph
 from SpooksHelperLib.Utils import utils
+from fpdf import FPDF
 
 import numpy as np
 
@@ -17,7 +18,6 @@ class generatePDF:
         ToeLevel, SumTanForce, WallMass, WeightWallTotal = ph.generateToeLevel(
             VerticalEquilibriumOutput, PDFdict['Analysis'], PDFdict['SoilLayersFront'], PDFdict['zT']
         )
-        PlotLevels, e1, e2, Moment, ShearForce, DW, ENet, JU = ph.extractPlotResults(PlotResults)
         Sheetpiledict, Sheetpile, u_rel, control_Rot, u_rel_lvl = ph.extractSheetPileInput(Analysis, SheetPileAddOnResults)
 
         # === PDF Setup ===
@@ -35,14 +35,14 @@ class generatePDF:
         pdf = ph.fillPDF('Initials', PDFdict, pdf, col_width, th)
         pdf = ph.fillPDF('Subject', PDFdict, pdf, col_width, th)
         pdf = ph.fillPDF('AnalysisNo', PDFdict, pdf, col_width, th, 4, 'Calculation no.')
-
+        print("metadata added...")
         # === Check ===
         pdf.cell(200, 10, txt="1.2 Check", ln=11, align='L')
         pdf = ph.fillPDF('Checker', PDFdict, pdf, col_width, th)
         pdf.cell(col_width[0], 2 * th, str('Date:'), border=1)
         pdf.cell(col_width[1], 2 * th, str(''), border=1)
         pdf.ln(4 * th)
-
+        print("pdf checked...")
         # === Approval ===
         pdf.cell(200, 10, txt="1.2 Approval", ln=11, align='L')
         pdf = ph.fillPDF('Approver', PDFdict, pdf, col_width, th)
@@ -57,7 +57,7 @@ class generatePDF:
 
         pdf.set_font("Courier", size=12)
         pdf = ph.fillPDFext('zT', PDFdict, pdf, col_width, th, 'm')
-
+        print("ready for input parameters...")
         # === Anchors ===
         if PDFdict['AnchorLevel'] is not None:
             pdf = ph.fillPDFext('AnchorLevel', PDFdict, pdf, col_width, th, 'm', 2, 'Anchor level, zA')
@@ -71,6 +71,7 @@ class generatePDF:
                 pdf.cell(col_width[0], 2 * th, str('kN/m'), border=1)
                 pdf.ln(2 * th)
 
+        print("finished anchor level")
         # === Wall Mass and Water Density ===
         pdf.cell(col_width[0], 2 * th, str('Mass of wall:'), border=1)
         pdf.cell(col_width[1], 2 * th, str(WallMass), border=1)
@@ -78,13 +79,14 @@ class generatePDF:
         pdf.ln(2 * th)
 
         pdf = ph.fillPDFext('WaterDensity', PDFdict, pdf, col_width, th, 'kN/m3', 2, 'Water density, gam_w')
-
+        print("Wall Mass and water density finished...")
         # === Geometry and Soil ===
+        print(PDFdict['State'], PDFdict['SlopeBack'], PDFdict['SlopeFront'], PDFdict['SoilProfile'])
         pdf = ph.fillPDFext('State', PDFdict, pdf, col_width, th, '-')
         pdf = ph.fillPDFext('SlopeBack', PDFdict, pdf, col_width, th, 'deg.', 2, 'Slope back')
         pdf = ph.fillPDFext('SlopeFront', PDFdict, pdf, col_width, th, 'deg.', 2, 'Slope Front')
         pdf = ph.fillPDFext('SoilProfile', PDFdict, pdf, col_width, th, '-', 2, 'Soil profile')
-
+        print("geometry and soil...")
         # === Soil Layers ===
         col_width = [epw / 12, epw / 6]
         SoilData = [
@@ -96,7 +98,7 @@ class generatePDF:
                                     "2.1 Characteristic soil parameters back")
         pdf = ph.appendSoillayerData(SoilData, PDFdict['SoilLayersFront'], pdf, col_width, th,
                                     "2.2 Characteristic soil parameters front")
-
+        print("Soil data done...")
         # === Water Levels ===
         pdf = self.waterlevel(epw, pdf, PDFdict, th)
 
@@ -122,10 +124,11 @@ class generatePDF:
         pdf = self.pressAndStructForce(pdf, th, epw, Analysis, PlotResults, Sheetpiledict)
 
         # === Save PDF ===
+        print('Saving pdf...')
         TemporaryPath = utils.TemporaryWorkingDirectory()
-        TemporaryPath = os.path.join(TemporaryPath, r'pdfresults.pdf')
+        TemporaryPath = os.path.join(TemporaryPath, r'PDFresults.pdf')
         pdf.output(TemporaryPath)
-
+        print(pdf.output(TemporaryPath))
         return TemporaryPath
 
 
@@ -319,7 +322,7 @@ class generatePDF:
             # Moment at anchor
             ph.fillResultext(pdf,abs(PDFdict['MomentAtAnchor']),th,col_width,'|Moment| at anchor level','kNm/m')
         # Tangential earth pressure resultant
-        ph.fillResultext(pdf,PDFdict['SUmTanForce'],th,col_width,'Sum of tangential earth pressure*','kN/m')
+        ph.fillResultext(pdf,SumTanForce,th,col_width,'Sum of tangential earth pressure*','kN/m')
         # Sum of vertical forces
         pdf.cell(col_width[0], 2*th, str('Sum of vertical forces*:'), border=1)
         if PDFdict['AnchorLevel'] != None:

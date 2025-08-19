@@ -3,16 +3,13 @@ import numpy as np
 import os
 import io
 from openpyxl import load_workbook
-from tkinter import ttk
-import tkinter as tk
 
 
 ###In this file you will find miscellaneous utility functions.
 
 class utils:
     def __init__(self):
-        self.InputFileIDGUI = 'A3'
-        self.stat = ttk.Label(ttk.Frame(ttk.Notebook(tk.Tk())), text = " No input file",font = ("Calibri",11))
+        pass
         
 
     ####This function generalises the data row creation. The next function does the same thing, but for multiple cells. It takes an array with a set of ranges, and for those ranges it readies the data rows.
@@ -27,6 +24,7 @@ class utils:
         return data_rows
     
     def data_rows_arr(cellrangearr):
+        print("Data_rows_array...")
         return_array = []
         for cellrange in cellrangearr:
             data_rows = []
@@ -39,19 +37,6 @@ class utils:
             return_array.append(data_rows)
         
         return return_array
-
-    def InputFileIDChecker(self,InputFileID):        
-        InputFileStatus = None
-        
-        if InputFileID == self.InputFileIDGUI:
-            
-            InputFileStatus = 'OK'
-            
-        else:
-            
-            self.stat.configure(text = 'Input file version does not match GUI version')
-            
-        return InputFileStatus
 
 
     def TemporaryWorkingDirectory():
@@ -123,6 +108,7 @@ class utils:
     
 
     def ImportExcel(input_path):
+        print("importExcel...")
         #### Loading excel workbook
         xlsx_filename=input_path
         with open(xlsx_filename, "rb") as f:
@@ -194,6 +180,7 @@ class utils:
     
     
     def make_analysis_dict(self,Analyses, Analysis, ImportData, anchor_level, anchor_inclination, prescribed_anchor_force, vararr, geninfoarr):
+        print("make analysis dict...")
         from SpooksHelperLib.Generators import generators
         sheetpile_addon = ImportData.get('SheetPileAddOn')
         SheetPileAddOnInput = {}
@@ -361,3 +348,23 @@ class utils:
             return float(format(float(val), f'.{precision}f'))
         except (ValueError, TypeError):
             return default
+    
+    def InputFileIDChecker(InputFileID):
+        print("input file id checker...")
+        InputFileIDGUI = 'A3'
+        
+        InputFileStatus = None
+        
+        if InputFileID == InputFileIDGUI:
+            
+            InputFileStatus = 'OK'
+            
+        else:
+            
+            InputFileStatus = 'Error! This file is not supported!'
+
+            
+        return InputFileStatus
+
+    def hello_world(self):
+        return "Hello world!"

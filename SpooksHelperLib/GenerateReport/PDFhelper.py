@@ -2,6 +2,9 @@ from fpdf import FPDF
 
 
 class PDFhelper:
+    def __init__(self):
+        pass
+        
     def generatePDFdict(VerticalEquilibriumOutput):
         GetResultsOutput = VerticalEquilibriumOutput.get('GetResultsOutput')
         Analysis = VerticalEquilibriumOutput.get('Analysis')
@@ -117,12 +120,11 @@ class PDFhelper:
         
             # Page footer
             def footer(self):
-                from GUI_SPOOKSFunctions_2_0 import Version
-                
+                version = '3'
                 # Position at 1.5 cm from bottom
                 self.set_y(-15)
                 self.set_font('Courier', '', 7)
-                self.cell(0, 10, 'COWI WinSpooks Plug-in '+PDFdict['Version'], 0, 0, 'L')
+                self.cell(0, 10, 'COWI WinSpooks Plug-in '+ version, 0, 0, 'L')
                 # Page number
                 self.set_font('Courier', '', 9)
                 self.cell(0, 10, 'Page ' + str(self.page_no()) + ' / {nb}', 0, 0, 'R')

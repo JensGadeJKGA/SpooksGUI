@@ -43,7 +43,9 @@ class generateReport:
         rf = reportFront()
         gp = generatePDF()
         TempReportFrontPath = rf.ReportFront(VerticalEquilibriumOutput,OutputDirList,Version)
+        print("TEMPREPORTFRONTPATH: \n",TempReportFrontPath, "\n\n")
         TemporaryPathResults = gp.PDFGenerator(VerticalEquilibriumOutput, SheetPileAddOnResults, Version)
+        print("TEMPORARYPATHRESULTS: \n",TemporaryPathResults,"\n\n")
         
         ## Temporary file dir
         TemporaryPathReport = utils.TemporaryWorkingDirectory()
@@ -69,7 +71,7 @@ class generateReport:
                 pdfMerger.write(f)
                 
             f.close()
-        
+        print("TEMPORARYPATHREPORT: \n",TemporaryPathReport,"\n\n")
         ### Deleting input pdfs
         os.remove(TempReportFrontPath)
         os.remove(TemporaryPathResults)
