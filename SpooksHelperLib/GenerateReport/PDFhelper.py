@@ -198,12 +198,17 @@ class PDFhelper:
         pdf.ln(i*th)
         return pdf
         
-    def fillResultext(pdf,pdfdictentry,th, col_width,text,name):
-        pdf.cell(col_width[0], 2*th, str(text+':'), border=1)
-        pdf.cell(col_width[1], 2*th, str(format(pdfdictentry,'.1f')), border=1)
+    def fillResultext(pdf, pdfdictentry, th, col_width, text, name):
+        pdf.cell(col_width[0], 2*th, str(text + ':'), border=1)
+        if isinstance(pdfdictentry, (int, float)):
+            value_str = format(pdfdictentry, '.1f')
+        else:
+            value_str = str(pdfdictentry)
+        pdf.cell(col_width[1], 2*th, value_str, border=1)
         pdf.cell(col_width[0], 2*th, str(name), border=1)
         pdf.ln(2*th)
         return pdf
+
     
     def fillSheetpileAddOn(names,texts,sheetpileinput,th,col_width,pdf):
         for name,text,sheetpile in zip(names,texts,sheetpileinput):

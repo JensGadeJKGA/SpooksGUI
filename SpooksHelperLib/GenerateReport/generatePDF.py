@@ -321,7 +321,10 @@ class generatePDF:
         pdf.cell(200, 10, txt = "3.1 Summary", 
                 ln = 6, align = 'L')
         col_width = [epw*6/12,epw*2/12]
-        AnchorAxial = PDFdict['AnchorForce']/np.cos(np.radians(PDFdict['AnchorInclination']))
+        if PDFdict['AnchorForce'] == 'N/A':
+            AnchorAxial = 'N/A'
+        else:
+            AnchorAxial = PDFdict['AnchorForce']/np.cos(np.radians(PDFdict['AnchorInclination']))
 
         # Max. moment
         ph.fillResultext(pdf,abs(PDFdict['MaxMoment']),th,col_width,'Max. |moment|','kNm/m')
@@ -338,12 +341,17 @@ class generatePDF:
             # Axial anchor force
             ph.fillResultext(pdf,AnchorAxial,th,col_width,'Axial anchor force', 'kN/m')
             # Moment at anchor
-            ph.fillResultext(pdf,abs(PDFdict['MomentAtAnchor']),th,col_width,'|Moment| at anchor level','kNm/m')
+            moment_str = PDFdict['MomentAtAnchor']
+            try:
+                moment_val = abs(float(moment_str))
+            except (ValueError, TypeError):
+                moment_val = moment_str
+            ph.fillResultext(pdf,moment_val,th,col_width,'|Moment| at anchor level','kNm/m')
         # Tangential earth pressure resultant
         ph.fillResultext(pdf,SumTanForce,th,col_width,'Sum of tangential earth pressure*','kN/m')
         # Sum of vertical forces
         pdf.cell(col_width[0], 2*th, str('Sum of vertical forces*:'), border=1)
-        if PDFdict['AnchorLevel'] != None:
+        if PDFdict['AnchorLevel'] != None and AnchorAxial != 'N/A':
             pdf.cell(col_width[1], 2*th, str(format(SumTanForce-AnchorAxial*np.sin(np.radians(float(PDFdict['AnchorInclination'])))-WeightWallTotal,'.1f')), border=1)
         else:
             pdf.cell(col_width[1], 2*th, str(format(SumTanForce-WeightWallTotal,'.1f')), border=1)

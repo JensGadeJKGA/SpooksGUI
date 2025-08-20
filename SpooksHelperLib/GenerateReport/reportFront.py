@@ -98,7 +98,9 @@ class reportFront:
         )
 
         # Results box ---
-        if reportDict['AnchorLevel'] is not None:
+        if reportDict['AnchorLevel'] is not None and reportDict['AnchorForce'] != 'N/A':
+            print(reportDict['AnchorForce'])
+            print(np.cos(np.radians(reportDict['AnchorInclination'])))
             AnchorAxial = reportDict['AnchorForce'] / np.cos(np.radians(reportDict['AnchorInclination']))
             net_force = reportDict['SumTanForce'] - WeightWallTotal - AnchorAxial * np.sin(np.radians(reportDict['AnchorInclination']))
             result_text = (
