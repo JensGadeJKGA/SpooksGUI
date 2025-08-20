@@ -368,3 +368,18 @@ class utils:
 
     def hello_world(self):
         return "Hello world!"
+    
+    def floatify(value):
+        if isinstance(value, (int, float)):
+            return value
+        
+        if isinstance(value, str):
+            try:
+                return float(value)
+            except ValueError:
+                try:
+                    return float(value.replace(",", "."))
+                except ValueError:
+                    raise ValueError(f"Cannot convert '{value}' to float")
+        
+        return value

@@ -55,14 +55,14 @@ class soilprofiles():
                         'KeepDrained': None}
                 
             
-            SoilLayer['TopLayer'] = float(format(Stratification.iloc[x,1], '.2f'))
-            SoilLayer['Gamma_d'] =  float(format(Stratification.iloc[x,2], '.2f'))
-            SoilLayer['Gamma_m'] =  float(format(Stratification.iloc[x,3], '.2f'))
-            SoilLayer['cu'] =       float(format(Stratification.iloc[x,4], '.2f'))
-            SoilLayer['c'] =        float(format(Stratification.iloc[x,5], '.2f'))
-            SoilLayer['phi'] =      float(format(Stratification.iloc[x,6], '.2f'))
-            SoilLayer['i'] =        float(format(Stratification.iloc[x,7], '.2f'))
-            SoilLayer['r'] =        float(format(Stratification.iloc[x,8], '.2f'))
+            SoilLayer['TopLayer'] = float(format(utils.floatify(Stratification.iloc[x,1]), '.2f'))
+            SoilLayer['Gamma_d'] =  float(format(utils.floatify(Stratification.iloc[x,2]), '.2f'))
+            SoilLayer['Gamma_m'] =  float(format(utils.floatify(Stratification.iloc[x,3]), '.2f'))
+            SoilLayer['cu'] =       float(format(utils.floatify(Stratification.iloc[x,4]), '.2f'))
+            SoilLayer['c'] =        float(format(utils.floatify(Stratification.iloc[x,5]), '.2f'))
+            SoilLayer['phi'] =      float(format(utils.floatify(Stratification.iloc[x,6]), '.2f'))
+            SoilLayer['i'] =        float(format(utils.floatify(Stratification.iloc[x,7]), '.2f'))
+            SoilLayer['r'] =        float(format(utils.floatify(Stratification.iloc[x,8]), '.2f'))
             SoilLayer['Description'] = Stratification.iloc[x,9]
             SoilLayer['KeepDrained'] = Stratification.iloc[x,10]
 

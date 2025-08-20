@@ -248,7 +248,7 @@ label_outputdir.grid(column = 1, row = 13, sticky = 'E')
 label_dir = ttk.Label(tabcalc, text = "No directory",font = ("Calibri",11), foreground = 'grey')
 label_dir.grid(column = 2, row = 13, sticky = 'W')
 ## Open Spooks Button
-button_spooks = ttk.Button(tabcalc, text="Open Spooks", command = OpenSpooks, state='enabled')
+button_spooks = ttk.Button(tabcalc, text="Open WinSpooks", command = OpenSpooks, state='enabled')
 button_spooks.grid(column = 6, row = 13, sticky = 'E')
 ## Browse button
 button_output = ttk.Button(tabcalc, text = "Browse", command = OutputDialog, state='disabled')
@@ -329,66 +329,32 @@ logtxt.grid(column=1, row=1)
 
 ####################### Version tab #########################################
 ### Logo and header
-label_logo = ttk.Label(tabvers, text = " COWI", font=("Century Schoolbook", 33), foreground = 'orange red')
-label_logo.grid(column = 0, row = 0, sticky = 'SE')
-label_header = ttk.Label(tabvers, text = "Version", font=("Calibri", 16))
-label_header.grid(column = 4, row = 0, sticky = 'SW')
-#### empty cell
-enter11 = ttk.Label(tabvers, text = "")
-enter11.grid(column = 1, row = 1)
-#### empty cell
-enter12 = ttk.Label(tabvers, text = "")
-enter12.grid(column = 1, row = 2)
-label_vershead_vers = ttk.Label(tabvers, text = "Version",font = ("Calibri",12))
-label_vershead_vers.grid(column = 1, row = 3, sticky = 'W')
-label_vers_vers2 = ttk.Label(tabvers, text = "3.0",font = ("Calibri",12))
-label_vershead_vers.grid(column = 1, row = 4, sticky = 'W')
-label_vers_vers2 = ttk.Label(tabvers, text = "2.0",font = ("Calibri",12))
-label_vers_vers2.grid(column = 1, row = 5, sticky = 'W')
-label_vers_vers1 = ttk.Label(tabvers, text = "1.0",font = ("Calibri",12))
-label_vers_vers1.grid(column = 1, row = 6, sticky = 'W')
-label_vers_vers2 = ttk.Label(tabvers, text = "0.1",font = ("Calibri",12))
-label_vers_vers2.grid(column = 1, row = 7, sticky = 'W')
-label_vershead_date = ttk.Label(tabvers, text = "Date",font = ("Calibri",12))
-label_vershead_date.grid(column = 2, row = 3, sticky = 'W')
-label_vers_date1 = ttk.Label(tabvers, text = "??????????",font = ("Calibri",12))
-label_vershead_date.grid(column = 2, row = 4, sticky = 'W')
-label_vers_date1 = ttk.Label(tabvers, text = "22.03.2024",font = ("Calibri",12))
-label_vers_date1.grid(column = 2, row = 5, sticky = 'W')
-label_vers_date1 = ttk.Label(tabvers, text = "12.05.2020",font = ("Calibri",12))
-label_vers_date1.grid(column = 2, row = 6, sticky = 'W')
-label_vers_date2 = ttk.Label(tabvers, text = "10.01.2020",font = ("Calibri",12))
-label_vers_date2.grid(column = 2, row = 7, sticky = 'W')
-label_vershead_prep = ttk.Label(tabvers, text = "Prepared",font = ("Calibri",12))
-label_vershead_prep.grid(column = 3, row = 3, sticky = 'W')
-label_vers_prep1 = ttk.Label(tabvers, text = "JKGA",font = ("Calibri",12))
-label_vers_prep1.grid(column = 3, row = 4, sticky = 'W')
-label_vers_prep1 = ttk.Label(tabvers, text = "EMBT",font = ("Calibri",12))
-label_vers_prep1.grid(column = 3, row = 5, sticky = 'W')
-label_vers_prep1 = ttk.Label(tabvers, text = "EMBT",font = ("Calibri",12))
-label_vers_prep1.grid(column = 3, row = 6, sticky = 'W')
-label_vers_prep2 = ttk.Label(tabvers, text = "EMBT",font = ("Calibri",12))
-label_vers_prep2.grid(column = 3, row = 7, sticky = 'W')
-label_vershead_check = ttk.Label(tabvers, text = "Checked",font = ("Calibri",12))
-label_vershead_check.grid(column = 4, row = 3, sticky = 'W')
-label_vers_check1 = ttk.Label(tabvers, text = "JKGA",font = ("Calibri",12))
-label_vers_check1.grid(column = 4, row = 4, sticky = 'W')
-label_vers_check1 = ttk.Label(tabvers, text = "MLHU",font = ("Calibri",12))
-label_vers_check1.grid(column = 4, row = 5, sticky = 'W')
-label_vers_check1 = ttk.Label(tabvers, text = "EMSS",font = ("Calibri",12))
-label_vers_check1.grid(column = 4, row = 6, sticky = 'W')
-label_vers_check2 = ttk.Label(tabvers, text = "EMSS",font = ("Calibri",12))
-label_vers_check2.grid(column = 4, row = 7, sticky = 'W')
-label_vershead_desc = ttk.Label(tabvers, text = "Description",font = ("Calibri",12))
-label_vershead_desc.grid(column = 5, row = 3, sticky = 'W')
-label_vers_desc1 = ttk.Label(tabvers, text = "Completely refactored source code",font = ("Calibri",12))
-label_vers_desc1.grid(column = 5, row = 4, sticky = 'W')
-label_vers_desc1 = ttk.Label(tabvers, text = "Added sheet pile wall - Add on",font = ("Calibri",12))
-label_vers_desc1.grid(column = 5, row = 5, sticky = 'W')
-label_vers_desc1 = ttk.Label(tabvers, text = "Report generation and vertical equilibrium added",font = ("Calibri",12))
-label_vers_desc1.grid(column = 5, row = 6, sticky = 'W')
-label_vers_desc2 = ttk.Label(tabvers, text = "Test version",font = ("Calibri",12))
-label_vers_desc2.grid(column = 5, row = 7, sticky = 'W')
+label_logo = ttk.Label(tabvers, text=" COWI", font=("Century Schoolbook", 33), foreground='orange red')
+label_logo.grid(column=0, row=0, sticky='SE')
+
+label_header = ttk.Label(tabvers, text="Version", font=("Calibri", 16))
+label_header.grid(column=4, row=0, sticky='SW')
+
+# Define version history properly
+version_history = [
+    {"version": "3.0", "date": "20.08.2025", "prepared": "JKGA", "checked": "JKGA", "desc": "Completely refactored source code"},
+    {"version": "2.0", "date": "22.03.2024", "prepared": "EMBT", "checked": "MLHU", "desc": "Added sheet pile wall - Add on"},
+    {"version": "1.0", "date": "12.05.2020", "prepared": "EMBT", "checked": "EMSS", "desc": "Report generation and vertical equilibrium added"},
+    {"version": "0.1", "date": "10.01.2020", "prepared": "EMBT", "checked": "EMSS", "desc": "Test version"},
+]
+
+# Column headers
+headers = ["Version", "Date", "Prepared", "Checked", "Description"]
+for col, head in enumerate(headers, start=1):
+    ttk.Label(tabvers, text=head, font=("Calibri", 12, "bold")).grid(column=col, row=3, sticky="W")
+
+# Fill in version history table
+for row, entry in enumerate(version_history, start=4):
+    ttk.Label(tabvers, text=entry["version"], font=("Calibri", 12)).grid(column=1, row=row, sticky="W")
+    ttk.Label(tabvers, text=entry["date"], font=("Calibri", 12)).grid(column=2, row=row, sticky="W")
+    ttk.Label(tabvers, text=entry["prepared"], font=("Calibri", 12)).grid(column=3, row=row, sticky="W")
+    ttk.Label(tabvers, text=entry["checked"], font=("Calibri", 12)).grid(column=4, row=row, sticky="W")
+    ttk.Label(tabvers, text=entry["desc"], font=("Calibri", 12)).grid(column=5, row=row, sticky="W")
 ####################### End of log tab #############################
 
 tab_parent.pack(expand=1, fill='both')

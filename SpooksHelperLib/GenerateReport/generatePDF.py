@@ -110,19 +110,20 @@ class generatePDF:
 
         # === Safety Factors ===
         pdf = self.partialSafetyFactors(epw, pdf, PDFdict, th)
-
+ 
         # === Failure Mode ===
         pdf = self.failureMode(pdf, epw, PDFdict, th)
-
+  
         # === King Post Wall ===
         pdf = self.kingPostWall(pdf, PDFdict, epw, th)
 
         # === Results Summary ===
         pdf = self.results(pdf, th, epw, PDFdict, SumTanForce, WeightWallTotal)
 
-        # === Pressure and Structural Forces ===
-        pdf = self.pressAndStructForce(pdf, th, epw, Analysis, PlotResults, Sheetpiledict)
-
+        # === Pressure and Structural Forces... Mostly sheet pile ===
+        if self.pressAndStructForce(pdf, th, epw, Analysis, PlotResults, Sheetpiledict, SheetPileAddOnResults) is not None:
+            pdf = self.pressAndStructForce(pdf, th, epw, Analysis, PlotResults, Sheetpiledict, SheetPileAddOnResults)
+        print(pdf)
         # === Save PDF ===
         print('Saving pdf...')
         TemporaryPath = utils.TemporaryWorkingDirectory()
@@ -133,6 +134,9 @@ class generatePDF:
 
 
     def waterlevel(self, epw, pdf, PDFdict,th):
+        if PDFdict.get('WaterLevelBack') is None or PDFdict.get('WaterLevelFront') is None:
+            raise PDFSectionError("A problem with water levels occurred, please check your data.")
+    
         col_width = epw/6
         pdf.ln(2*th)
         pdf.cell(200, 10, txt = "2.3 Water levels", 
@@ -150,6 +154,7 @@ class generatePDF:
         return pdf
 
     def addPressure(self, pdf, PDFdict, epw, th):
+    
         pdf.ln(2*th)
         if PDFdict['AddPressureProfile'] in ['AP1','AP2','AP3','AP4','AP5','AP6','AP7','AP8','AP9','AP10']:
             pdf.cell(200, 10, txt = "2.4 Additional pressure profile:"+' '+ PDFdict['AddPressureProfile'], 
@@ -183,6 +188,9 @@ class generatePDF:
         return pdf
         
     def loads(self,epw,pdf,th,PDFdict):
+        if any(PDFdict.get(key) is None for key in ['zR', 'LoadBack', 'LoadFront', 'AxialWallLoad']):
+            raise PDFSectionError("A problem with loads occurred, please check your data.")
+
         col_width = epw/6
         pdf.ln(2*th)
         pdf.cell(200, 10, txt = "2.5 Loads", 
@@ -205,6 +213,9 @@ class generatePDF:
         return pdf
 
     def partialSafetyFactors(self,epw,pdf,PDFdict,th):
+        if 'PartialSafetyFactors' not in PDFdict or PDFdict['PartialSafetyFactors'] is None:
+            raise PDFSectionError("A problem with partial safety factors occurred, please check your data.")
+        
         PartialSafetyFactors = PDFdict['PartialSafetyFactors']
         col_width1 = epw*3/12
         col_width2 = epw/12
@@ -241,6 +252,10 @@ class generatePDF:
         return pdf
     
     def failureMode(self,pdf,epw,PDFdict,th,):
+        if any(PDFdict.get(key) is None for key in ['iA', 'iB', 'iC']):
+            raise PDFSectionError("A problem with failure mode occurred, please check your data.")
+
+
         col_width = epw/6
         pdf.ln(2*th)
         pdf.cell(200, 10, txt = "2.7 Failure mode", 
@@ -262,6 +277,7 @@ class generatePDF:
         return pdf
     
     def kingPostWall(self,pdf,PDFdict,epw,th):
+
         col_width = epw/6
         pdf.ln(2*th)
         pdf.cell(200, 10, txt = "2.8 King post wall", 
@@ -290,7 +306,9 @@ class generatePDF:
         return pdf
 
     def results(self,pdf,th,epw,PDFdict,SumTanForce,WeightWallTotal):
-        
+        if any(PDFdict.get(key) is None for key in ['MaxMoment', 'MaxShearForce', 'ToeLevel']):
+            raise PDFSectionError("A problem with results summary occurred, please check your data.")
+
         #### Results
         # Header
         pdf.set_font("Courier", size = 15) 
@@ -326,7 +344,7 @@ class generatePDF:
         # Sum of vertical forces
         pdf.cell(col_width[0], 2*th, str('Sum of vertical forces*:'), border=1)
         if PDFdict['AnchorLevel'] != None:
-            pdf.cell(col_width[1], 2*th, str(format(SumTanForce-AnchorAxial*np.sin(np.radians(float(PDFdict['AnchorInclination'])))-PDFdict['WeightWallTotal'],'.1f')), border=1)
+            pdf.cell(col_width[1], 2*th, str(format(SumTanForce-AnchorAxial*np.sin(np.radians(float(PDFdict['AnchorInclination'])))-WeightWallTotal,'.1f')), border=1)
         else:
             pdf.cell(col_width[1], 2*th, str(format(SumTanForce-WeightWallTotal,'.1f')), border=1)
         pdf.cell(col_width[1], 2*th, str('kN/m'), border=1)
@@ -337,10 +355,10 @@ class generatePDF:
 
         return pdf
     
-    def pressAndStructForce(self,pdf,th,epw,Analysis,PlotResults,Sheetpiledict):
+    def pressAndStructForce(self,pdf,th,epw,Analysis,PlotResults,Sheetpiledict, SheetPileAddOnResults):
         #Extract inputs
         plotres = ph.extractPlotResults(PlotResults)
-        Sheetpiledict, Sheetpile, u_rel, control_Rot, u_rel_lvl = ph.extractSheetPileInput(Analysis)
+        Sheetpiledict, Sheetpile, u_rel, control_Rot, u_rel_lvl = ph.extractSheetPileInput(Analysis, SheetPileAddOnResults)
 
         #section 3.2 title
         pdf.ln(2*th)
@@ -373,17 +391,17 @@ class generatePDF:
             pdf.cell(200, 10, txt="4.1 Input", ln=6, align='L')
             
             col_widths = [epw*7/12,epw*2/12]
-            text = ['Add on active?','Limit state','Control class','Optimize','Max. utilization','fyk','Beta_B','Beta_D','Design life','Soil compaction']
+            texts = ['Add on active?','Limit state','Control class','Optimize','Max. utilization','fyk','Beta_B','Beta_D','Design life','Soil compaction']
             name = ['-','-','-','-','-','MPa','-','-','Years','-']
-            ph.fillSheetpileAddOn(name,text,Sheetpiledict,th,col_widths,pdf)
+            ph.fillSheetpileAddOn(name,texts,Sheetpiledict,th,col_widths,pdf)
 
             # corrosion rate at max. M, front
             pdf.cell(epw*11/12, 2*th, str('Corrosion rates (total)'), border=1)
             pdf.ln(2*th)
 
-            pdf.cell(col_width1, 2*th, str('Level (m)'), border=1)
-            pdf.cell(col_width2, 2*th, str('Rate'), border=1)
-            pdf.cell(col_width2, 2*th, str('Unit'), border=1)
+            pdf.cell(col_widths[0], 2*th, str('Level (m)'), border=1)
+            pdf.cell(col_widths[1], 2*th, str('Rate'), border=1)
+            pdf.cell(col_widths[0], 2*th, str('Unit'), border=1)
             pdf.ln(2*th)
 
             for lvl, rate in zip(Sheetpiledict['tCorLevel'], Sheetpiledict['tCor']):
@@ -420,3 +438,7 @@ class generatePDF:
                     pdf.ln(2 * th)
             
             return pdf
+
+class PDFSectionError(Exception):
+    """Raised when a PDF section cannot be generated due to bad input data."""
+    pass
