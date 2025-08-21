@@ -121,9 +121,8 @@ class generatePDF:
         pdf = self.results(pdf, th, epw, PDFdict, SumTanForce, WeightWallTotal)
 
         # === Pressure and Structural Forces... Mostly sheet pile ===
-        if self.pressAndStructForce(pdf, th, epw, Analysis, PlotResults, Sheetpiledict, SheetPileAddOnResults) is not None:
-            pdf = self.pressAndStructForce(pdf, th, epw, Analysis, PlotResults, Sheetpiledict, SheetPileAddOnResults)
-        print(pdf)
+        pdf = self.pressAndStructForce(pdf, th, epw, Analysis, PlotResults, Sheetpiledict, SheetPileAddOnResults)
+
         # === Save PDF ===
         print('Saving pdf...')
         TemporaryPath = utils.TemporaryWorkingDirectory()
@@ -445,7 +444,7 @@ class generatePDF:
                     pdf.cell(col_width2, 2 * th, '-', border=1)
                     pdf.ln(2 * th)
             
-            return pdf
+        return pdf
 
 class PDFSectionError(Exception):
     """Raised when a PDF section cannot be generated due to bad input data."""
