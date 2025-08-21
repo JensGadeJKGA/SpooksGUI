@@ -1,9 +1,54 @@
-Run the shortcut on the desktop to run the winspooks gui.
+Hello! Welcome to the WinSpooks GUI.
+In this text file, you will find:
+1. A short rundown of the file structure
+2. A guide to compile the program to an executable
+3. A guide on running the GUI on a computer without spooks (for testing purposes)
 
-In case there is no shortcut, run the file GUI_SPOOKSFunctions_2.0.exe from this directory.
+--------------------------------------------------------
+File structure
 
+In the file GUI_SPOOKSFunctions_3_0 you will find most of the GUI logic written out as a waterfall. This is a bit hard to read and manage, but if you use ctrl+f to search for the element you need,
+it is a bit more navigable.
+In this file you will also find the "calculate" function, which is where most of the program is run from.
+
+This is all for the GUI_SPOOKSFunctions_3_0 file, and we will now be moving into the helper library.
+
+The library is structured as follows:
+SpooksHelperLib/
+├── Export/                       
+│   ├── export.py                 > This file defines an export class with methods to extract geotechnical sheet pile wall analysis results and earth pressure results from feeder_output and export them as structured .txt files.
+│   ├── exportHelper.py           > This file defines an exportHelper class with utility functions to extract and compute sheet pile wall results (addon results, toe level, anchor data, wall weight, and vertical force equilibrium) for use in report exports.
+├── GenerateReport/
+│   ├── generatePDF.py            > This file defines the generatePDF class, which builds a structured geotechnical calculation report as a PDF (with sections for project info, input parameters, soil/water data, loads, safety factors, failure modes, results, and sheet pile add-on) using helper functions from PDFhelper, and includes a custom PDFSectionError for input validation.
+│   ├── generateReport.py         > This file defines the generateReport class, which creates complete geotechnical reports by generating individual PDFs (front page + results) with reportFront and generatePDF, merging them into a single report, and providing methods to batch-merge multiple analyses into one consolidated PDF report.
+│   ├── PDFHelper.py              > This file defines the PDFhelper class, a utility toolkit for assembling structured geotechnical calculation reports in PDF format. It provides methods to Extract and normalize input/output data, Instantiate and configure a styled PDF document, and Support flexible table-writing utilities 
+│   ├── reportFront.py            > The reportFront class generates the front-page figure of the geotechnical report, plotting soil layers, forces, water levels, wall geometry, and key results into a formatted PDF.
+│   ├── reportFrontHelpers.py     > The reportFrontHelpers class provides a comprehensive set of utilities for the report’s front-page figure, handling input extraction, soil layer and geometry processing, curve smoothing, plot scaling, slope/water/anchor line generation, soil property text formatting, and layered soil/anchor visualization to ensure accurate, well-structured geotechnical front-page plots.
+├── Analysis.py                   > analysisclass processes geotechnical analyses by determining valid analysis ranges, adding soil profiles and slopes, integrating additional pressures, applying design parameters with partial safety factors to back and front soil layers, and computing adjusted soil properties for systematic, analysis-ready datasets.
+├── Generators.py                 > Class for generating soil profiles, additional pressure profiles, sheet pile add-on inputs, and geotechnical analyses from Excel input data.
+├── openSpooks.py                 > Holds the function that opens spooks.
+├── plot.py                       > This file defines a plot class with a PlotResults method that organizes structural analysis data from multiple walls by parent analysis and visualizes maximum moments, shear forces, anchor forces, and toe levels in a 2x2 matplotlib plot.
+├── SoilProfiles.py               > This file defines a soilprofiles class with methods to generate, append, and format soil layer data from a stratification DataFrame into structured soil profiles for geotechnical analysis.
+├── SPOOKS.py                     > This file defines a spooksfile class that manages the generation of SPOOKS input files, execution of the WinSPOOKS program, logging, and extraction of results. It is structured to handle geotechnical analyses, including soil layers, anchor levels, and additional pressures.
+├── SPWplugin.py                  > This file holds the function that initializes the steel sheet pile wall plugin
+├── Steel_Sheet_Pile_Wall.py      > This file holds all the functions for the steel sheet pile addon.
+├── Utils.py                      > This file contains a collection of miscellaneous utility functions for reading, processing, and organizing geotechnical Excel data, calculating pressures and safety factors, parsing SPOOKS output, and handling general helper tasks.
+├── Vequilibrium.py               > This file defines a verticalEquilibrium class that calculates tangential forces in soil layers behind and in front of a wall to evaluate vertical equilibrium, and includes a feeder function to run multiple geotechnical analyses via the SPOOKS framework.
+
+(these descriptions may have been somewhat chatgpt assisted.)
+
+
+--------------------------------------------------------
+How to compile the program to an EXE file.
+1. open a terminal and navigate to the SPOOKSGUI folder (in an ide, you should be in there already. In powershell use the cd command and paste the file path)
+2. run the command "pyinstaller --onefile --hidden-import=numpy._core._exceptions --hidden-import=scipy.special._cdflib GUI_SPOOKSFunctions_3_0.py", which generates an executable file in a dist folder (also generated by the command)
+   -> if you want to make an executable in "silent mode" (without a logging terminal) run the following command instead: "pyinstaller --onefile --noconsole --hidden-import=numpy._core._exceptions --hidden-import=scipy.special._cdflib GUI_SPOOKSFunctions_3_0.py"
+3. to use the executable, export it to a remote pc that has the spooks program, and run it. A terminal will appear, and the gui will open shortly thereafter.
+
+--------------------------------------------------------
 to run the program in dev mode, locate the file GUI_SPOOKSFuncions_2.0.py and follow these steps:
-1.  Open the file GUI_SPOOKSFuncions_2.0.py in a text editor
+1.  Open the file GUI_SPOOKSFuncions_2.0.py in a text editor or an ide
 2.  Locate the function "OpenSpooks"
 3.  change the parameter dev_mode from false to true
 4.  change the value of the parameter "spoof_path" from None to "C:/Dummy/WinSpooks.exe"
+5.  run the file GUI_SPOOKSFunctions_3_0.py either with the command "python GUI_SPOOKSFunctions_3_0" or with right click > run python file in terminal.

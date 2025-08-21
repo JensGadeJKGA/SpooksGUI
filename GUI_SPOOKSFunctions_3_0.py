@@ -48,16 +48,6 @@ Version = '3'
 ################ Input file ID ############
 InputFileIDGUI = 'A3'
 
-################### FUNCTIONS ####################################
-
-
-############### GUI Functions
-################### 1. OPEN WINSPOOKS ###################################
-######### Check in WinSpooks is running - if not -> Run
-######### (necessary for license check)
-
-    
-
 ################# 2. STARTING UP GUI INTERFACE #######################
 window = tk.Tk()
 window.minsize(1300,600) ## Initial GUI size
