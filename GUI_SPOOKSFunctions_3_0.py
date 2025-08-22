@@ -49,6 +49,7 @@ Version = '3'
 InputFileIDGUI = 'A3'
 
 ################# 2. STARTING UP GUI INTERFACE #######################
+OpenSpooks
 window = tk.Tk()
 window.minsize(1300,600) ## Initial GUI size
 window.title("WinSPOOKS Plug-in")

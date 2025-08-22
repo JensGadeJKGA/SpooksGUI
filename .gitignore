@@ -1,2 +1,5 @@
 dist/GUI_SPOOKSFunctions_2_0.exe
 build/GUI_SPOOKSFunctions_2_0/GUI_SPOOKSFunctions_2_0.pkg
+SpooksGuiApp.exe
+SpooksGuiApp.spec
+build/SpooksGuiApp/SpooksGuiApp.pkg
