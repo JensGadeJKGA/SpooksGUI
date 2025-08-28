@@ -35,7 +35,7 @@ SpooksHelperLib/
 ├── Utils.py                      > This file contains a collection of miscellaneous utility functions for reading, processing, and organizing geotechnical Excel data, calculating pressures and safety factors, parsing SPOOKS output, and handling general helper tasks.
 ├── Vequilibrium.py               > This file defines a verticalEquilibrium class that calculates tangential forces in soil layers behind and in front of a wall to evaluate vertical equilibrium, and includes a feeder function to run multiple geotechnical analyses via the SPOOKS framework.
 
-(these descriptions may have been somewhat chatgpt assisted.)
+(these descriptions may have been somewhat AI assisted.)
 
 
 --------------------------------------------------------
