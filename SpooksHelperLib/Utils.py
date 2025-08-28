@@ -31,7 +31,9 @@ class utils:
             for row in cellrange:
                 data_cols = []
                 for cell in row:
-                    data_cols.append(cell.value)
+                    if cell.value is not None:
+                        data_cols.append(cell.value)
+                    else: data_cols.append(0)
                 data_rows.append(data_cols)
                 pd.DataFrame(data_rows)
             return_array.append(data_rows)
