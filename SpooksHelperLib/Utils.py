@@ -367,9 +367,6 @@ class utils:
 
             
         return InputFileStatus
-
-    def hello_world(self):
-        return "Hello world!"
     
     def floatify(value):
         if isinstance(value, (int, float)):

@@ -97,8 +97,6 @@ class verticalEquilibrium():
     
     def SPOOKSFeeder(input_path,calcno,pb,tabcalc,logtxt,tk):    
         print("SpooksFeeder...")
-        u = utils()
-        u.hello_world()
         FeederOutput = []
         g = generators()
         
